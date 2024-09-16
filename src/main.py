@@ -4,7 +4,7 @@ from flask import Flask
 # Import objects from init.py
 from init import db, ma, bcrypt, jwt
 
-# Create the application
+# Define the app inside of an application factory function
 def  create_app():
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
