@@ -1,6 +1,13 @@
+from datetime import date
+
 from flask import Blueprint
 from init import db, bcrypt
+
 from models.user import User
+from models.workout import Workout
+from models.group import Group
+from models.marathon import Marathon
+from models.marathon_entry import MarathonEntry
 
 
 # Create a blueprint
@@ -30,11 +37,83 @@ def seed_tables():
             password = bcrypt.generate_password_hash("123456").decode("utf-8")
         )
     ]
-
     db.session.add_all(users)
+    
+    workouts = [
+        Workout(
+        date = date.today(),
+        distance_kms = 10,
+        duration_minutes = 60,
+        calories_burnt = 235,
+        user = users[0]
+    ), Workout(
+        date = date.today(),
+        distance_kms = 10,
+        duration_minutes = 30,
+        calories_burnt = 250,
+        user = users[1]
+    )]
+    db.session.add_all(workouts)
+
+
+    groups = [
+            Group(
+                name = "Group A",
+                date_created = date.today(),
+                experience_level = "Intermediate",
+                members_capacity = 5,
+                created_by = "Jess",
+                user = users[1]
+            ), 
+            Group(
+                name = "Group B",
+                date_created = date.today(),
+                experience_level = "Advanced",
+                members_capacity = 3,
+                created_by = "Iryna",
+                user = users[1]
+            )
+        ]
+    db.session.add_all(groups)
+
+
+    marathons = [
+            Marathon(
+                name = "Marathon A",
+                date = date.today(), 
+                city = "Gold Coast",
+                distance_kms = 10,
+                description = "Marathon for all levels"
+            ), 
+            Marathon(
+                name = "Marathon B",
+                date = date.today(),
+                city = "Melbourne",
+                distance_kms = 20,
+                description = "Marathon for advanced level"
+            )
+        ]
+    db.session.add_all(marathons)
+    db.session.commit()
+
+    entries = [
+            MarathonEntry(
+                date = date.today(),
+                group_id=groups[1].id,  
+                marathon_id=marathons[1].id 
+            ), 
+            MarathonEntry(
+                date = date.today(),
+                group_id=groups[0].id,  
+                marathon_id=marathons[0].id 
+            )
+        ]
+    db.session.add_all(entries)
+
+
     db.session.commit()
     print("Tables seeded!")
- 
+
 
 # Drop tables command
 @db_commands.cli.command("drop")

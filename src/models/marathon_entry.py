@@ -3,10 +3,11 @@ from marshmallow import fields
 
 
 # Define table
-class Marathon_entry(db.Model):
+class MarathonEntry(db.Model):
     __tablename__ = "entries"
 
     id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date) 
     
 
     # Foreign keys
@@ -15,17 +16,17 @@ class Marathon_entry(db.Model):
 
 
     # Define relationship
-    group = db.relationship("Group", back_populates="entries")
-    marathon = db.relationship("Marathon", back_populates="entries")
+    # group = db.relationship("Group", back_populates="entries")
+    # marathon = db.relationship("Marathon", back_populates="entries")
 
 
 # Define Schema
 class EntrySchema(ma.Schema):
-    group = fields.Nested("UserSchema", only = ["name", "email"])
-    marathon = fields.Nested("MarathonSchema", only = ["name", "date"])
+    # group = fields.Nested("UserSchema", only = ["name", "email"])
+    # marathon = fields.Nested("MarathonSchema", only = ["name", "date"])
 
     class Meta:
-        fields = ["id", "group", "marathon"]
+        fields = ["id"]
 
 
 # Create Objects 
