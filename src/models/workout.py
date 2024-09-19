@@ -17,11 +17,12 @@ class Workout(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
 
-    # Define relationships, set bidirectional relationship.
+    # Define bidirectional relationships
     user = db.relationship("User", back_populates = "workouts")
 
 
-# Define Schema
+# Define User Schema to serialize/ deserialized fields
+# Unpack complex data with fields.Nested method
 class WorkoutSchema(ma.Schema):
     user = fields.Nested("UserSchema", only=["name"])
     class Meta:
@@ -29,6 +30,5 @@ class WorkoutSchema(ma.Schema):
 
 
 # Create schema objects to handle one or multiple items
-
 workout_schema = WorkoutSchema()
 workouts_schema = WorkoutSchema(many=True)

@@ -15,7 +15,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
 
     
-    # Define relationships, set bidirectional relationship.
+    # Define bidirectional relationships
     workouts = db.relationship("Workout", back_populates = "user", cascade="all, delete")
     group = db.relationship("Group", back_populates= "user", cascade="all, delete")
 
