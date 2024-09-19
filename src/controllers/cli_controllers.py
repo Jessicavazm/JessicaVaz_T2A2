@@ -7,7 +7,7 @@ from models.user import User
 from models.workout import Workout
 from models.group import Group
 from models.marathon import Marathon
-from models.marathon_entry import MarathonEntry
+from models.marathon_log import Log
 
 
 # Create a blueprint
@@ -39,6 +39,7 @@ def seed_tables():
     ]
     db.session.add_all(users)
     
+
     workouts = [
         Workout(
         date = date.today(),
@@ -96,19 +97,20 @@ def seed_tables():
     db.session.add_all(marathons)
     db.session.commit()
 
-    entries = [
-            MarathonEntry(
+
+    logs = [
+            Log(
                 date = date.today(),
                 group_id=groups[1].id,  
                 marathon_id=marathons[1].id 
             ), 
-            MarathonEntry(
+            Log(
                 date = date.today(),
                 group_id=groups[0].id,  
                 marathon_id=marathons[0].id 
             )
         ]
-    db.session.add_all(entries)
+    db.session.add_all(logs)
 
 
     db.session.commit()

@@ -15,17 +15,15 @@ class Marathon(db.Model):
 
 
     # Define relationship
-    # groups = db.relationship("Group", back_populates= "marathons")
-    # entries = db.relationship("MarathonEntry", back_populates="marathons")
+    logs = db.relationship("Log", back_populates="marathons", cascade="all, delete")
 
 
 # Define Schema
 class MarathonSchema(ma.Schema):
-    # groups = fields.List(fields.Nested("GroupSchema", only=["name"]))
-    # entries = fields.List(fields.Nested("EntrySchema", only=["id"]))
+    log = fields.List(fields.Nested("LogSchema", only=["id"]))
 
     class Meta:
-        fields = ["id", "name", "date", "city", "distance_kms", "description"]
+        fields = ["id", "name", "date", "city", "distance_kms", "description", "log"]
 
 
 # Create Objects 

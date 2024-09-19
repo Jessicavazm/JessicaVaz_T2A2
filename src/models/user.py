@@ -16,18 +16,18 @@ class User(db.Model):
 
     
     # Define relationships, set bidirectional relationship.
-    workouts = db.relationship("Workout", back_populates = "user")
-    group = db.relationship("Group", back_populates= "user")
+    workouts = db.relationship("Workout", back_populates = "user", cascade="all, delete")
+    group = db.relationship("Group", back_populates= "user", cascade="all, delete")
 
 
 # Define User Schema to serialize/ deserialized fields
 # Unpack complex data with fields.Nested method
 class UserSchema(ma.Schema):
     workouts = fields.List(fields.Nested("WorkoutSchema", exclude=["user"]))
-    # group = fields.Nested("GroupSchema", only=["name"])
+    group = fields.Nested("GroupSchema", only=["name"])
 
     class Meta:
-        fields = ["id", "name", "email", "password", "is_admin", "workouts"]
+        fields = ["id", "name", "email", "password", "is_admin", "workouts", "group"]
 
 
 # Create schema objects to handle one or multiple items

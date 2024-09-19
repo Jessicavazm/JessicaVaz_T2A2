@@ -20,17 +20,17 @@ class Group(db.Model):
 
     # Define relationship
     user = db.relationship("User", back_populates= "group")
-    # marathon = db.relationship("Marathon", back_populates= "groups")
+    logs = db.relationship("Log", back_populates= "groups", cascade="all, delete")
 
 
 # Define Schema
 class GroupSchema(ma.Schema):
     user = fields.Nested("UserSchema", only=["name", "email"])
-    # marathon = fields.List(fields.Nested("MarathonSchema", exclude=["group"]))
+    log = fields.List(fields.Nested("LogSchema", exclude=["group"]))
 
 
     class Meta:
-        fields = ["id", "name", "date_created", "category_level", "members_capacity", "created_by", "user"]
+        fields = ["id", "name", "date_created", "category_level", "members_capacity", "created_by", "user", "log"]
 
 
 # Create Objects 
