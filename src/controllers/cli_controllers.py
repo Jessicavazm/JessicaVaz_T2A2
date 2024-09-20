@@ -1,8 +1,8 @@
 from datetime import date
 
 from flask import Blueprint
-from init import db, bcrypt
 
+from init import db, bcrypt
 from models.user import User
 from models.workout import Workout
 from models.group import Group
@@ -43,15 +43,15 @@ def seed_tables():
 
     workouts = [
         Workout(
+        title = "Running with friend",
         date = date.today(),
         distance_kms = 10,
-        duration_minutes = 60,
         calories_burnt = 235,
         user = users[0]
     ), Workout(
+        title = "Running with friend",
         date = date.today(),
         distance_kms = 10,
-        duration_minutes = 30,
         calories_burnt = 250,
         user = users[1]
     )]

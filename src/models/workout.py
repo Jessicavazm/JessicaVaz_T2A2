@@ -8,9 +8,9 @@ class Workout(db.Model):
 
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String)
     date = db.Column(db.Date, nullable=False)
     distance_kms = db.Column(db.Integer, nullable=False)
-    duration_minutes = db.Column(db.Integer)
     calories_burnt = db.Column(db.Integer)
 
     
@@ -29,7 +29,7 @@ class WorkoutSchema(ma.Schema):
     user = fields.Nested("UserSchema", only=["name"])
     
     class Meta:
-        fields = ["id", "date", "distance_kms", "duration_minutes", "calories_burnt", "user"]
+        fields = ["id", "title", "date", "distance_kms", "calories_burnt", "user"]
 
 
 # Create schema objects to handle one or multiple items
