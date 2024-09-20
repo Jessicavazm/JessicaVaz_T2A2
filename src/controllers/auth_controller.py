@@ -59,6 +59,32 @@ def login_user():
         return {"error": "Invalid credentials"}, 400
 
 
+# Update user's details, token required
+@auth_bp.route("users/<int:user_id>", methods = ["PUT", "PATCH"])
+@jwt_required()
+def update_user(user_id):
+    # Get the fields from body of the request, partial=True to update partial data
+    body_data = UserSchema().load(request.get_json(), partial=True)
+    password = body_data.get("password")
+    # Fetch user from DB using stmt, user.id comes from token, enforces authorisation
+    stmt = db.select(User).filter_by(id=get_jwt_identity())
+    user = db.session.scalar(stmt)
+    # If the user exist, update the required fields
+    if user:
+        # 'OR' statement evaluates what comes true first
+        user.name = body_data.get("name") or user.name
+        user.email = body_data.get("email") or user.email
+        if password:
+            user.password = bcrypt.generate_password_hash(password).decode("utf-8")
+        # Commit to the DB
+        db.session.commit()
+        # Return an acknowledgement message
+        return user_schema.dump(user)
+    # Else return error message
+    else:
+        return {"error": "User does not exist."}, 400
+
+
 # Delete user route, token required
 @auth_bp.route("users/<int:user_id>", methods=["DELETE"])
 @jwt_required()
