@@ -7,7 +7,7 @@ from models.user import User
 from models.workout import Workout
 from models.group import Group
 from models.marathon import Marathon
-from models.marathon_log import Log
+from models.log import Log
 
 
 # Create db_commands blueprint
@@ -37,6 +37,7 @@ def seed_tables():
             password = bcrypt.generate_password_hash("123456").decode("utf-8")
         )
     ]
+    # Add created users to DB
     db.session.add_all(users)
     
 
@@ -54,6 +55,7 @@ def seed_tables():
         calories_burnt = 250,
         user = users[1]
     )]
+    # Add created workouts to DB
     db.session.add_all(workouts)
 
 
@@ -75,6 +77,7 @@ def seed_tables():
                 user = users[0]
             )
         ]
+    # Add created groups to DB
     db.session.add_all(groups)
 
 
@@ -94,6 +97,7 @@ def seed_tables():
                 description = "Marathon for advanced level"
             )
         ]
+    # Add created marathons to DB and commit changes all changes above to DB
     db.session.add_all(marathons)
     db.session.commit()
 
@@ -110,9 +114,8 @@ def seed_tables():
                 marathon_id=marathons[0].id 
             )
         ]
+    # Add created logs and commit changes to DB
     db.session.add_all(logs)
-
-
     db.session.commit()
     print("Tables seeded!")
 

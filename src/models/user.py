@@ -4,10 +4,11 @@ from marshmallow import fields
 from marshmallow.validate import Regexp
 
 
-# Define 'users' table 
 class User(db.Model):
+    # Name of the table
     __tablename__ = "users"
 
+    # Attributes
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(50), nullable=False, unique=True)
@@ -20,7 +21,7 @@ class User(db.Model):
     group = db.relationship("Group", back_populates= "user", cascade="all, delete")
 
 
-# Define 'user' schema to serialize/ deserialize fields
+# Define 'user' schema and class 'Meta' fields to serialize/ deserialize data
 # Unpack complex data with fields.Nested method
 # Exclude 'user' from 'workouts' table, and only add 'name' from 'groups' table to avoid redundant data
 class UserSchema(ma.Schema):
