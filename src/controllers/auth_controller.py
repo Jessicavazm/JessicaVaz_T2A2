@@ -18,7 +18,7 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 def register_user():
     try:    
         # Get the data from the body of the request and stores it in variable = body_data
-        body_data = request.get_json()
+        body_data = UserSchema().load(request.get_json())
         # Create an instance of User model
         user = User(
             name = body_data.get("name"),
@@ -58,5 +58,22 @@ def login_user():
     else:
         return {"error": "Invalid credentials"}, 400
 
+
+# Delete user route, token required
+@auth_bp.route("users/<int:user_id>", methods=["DELETE"])
+@jwt_required()
+def delete_user(user_id):
+    # Find user in DB using stmt
+    stmt = db.select(User).filter_by(id= user_id)
+    user = db.session.scalar(stmt)
+    # If user exist, delete user and commit changes to DB
+    # Return acknowledgement message
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+        return {"message": f"User with {user_id} has been successfully deleted."}
+    # Else returns error message
+    else:
+        return {"message": f"User with id {user_id} has not been found."}
 
 
