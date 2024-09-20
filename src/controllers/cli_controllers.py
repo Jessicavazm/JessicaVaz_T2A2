@@ -10,18 +10,18 @@ from models.marathon import Marathon
 from models.marathon_log import Log
 
 
-# Create a blueprint
+# Create db_commands blueprint
 db_commands = Blueprint("db", __name__)
 
 
-# Create tables command
+# Command to create tables
 @db_commands.cli.command("create")
 def create_tables():
     db.create_all()
     print("Tables created!")
 
 
-# Seed tables command
+# Command to seed the tables
 @db_commands.cli.command("seed")
 def seed_tables():
     users = [
@@ -72,7 +72,7 @@ def seed_tables():
                 experience_level = "Advanced",
                 members_capacity = 3,
                 created_by = "Iryna",
-                user = users[1]
+                user = users[0]
             )
         ]
     db.session.add_all(groups)
@@ -117,7 +117,7 @@ def seed_tables():
     print("Tables seeded!")
 
 
-# Drop tables command
+# Command to drop the tables
 @db_commands.cli.command("drop")
 def drop_tables():
     db.drop_all()

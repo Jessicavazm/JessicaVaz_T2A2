@@ -2,7 +2,7 @@ from init import db, ma
 from marshmallow import fields
 
 
-# Define logs table
+# Define 'logs' table
 class Log(db.Model):
     __tablename__ = "logs"
 
@@ -10,23 +10,24 @@ class Log(db.Model):
     date = db.Column(db.Date) 
     
 
-    # Foreign keys
+    # Foreign keys to reference both 'groups' and 'marathons' tables
     group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
     marathon_id = db.Column(db.Integer, db.ForeignKey("marathons.id"), nullable=False)
 
 
-    # Define bidirectional relationships
+    # Define bidirectional relationships with 'groups' and 'marathons' tables
     groups = db.relationship("Group", back_populates="logs")
     marathons = db.relationship("Marathon", back_populates="logs")
 
 
-# Define User Schema to serialize/ deserialized fields
+# Define 'log' schema to serialize/ deserialize fields
 # Unpack complex data with fields.Nested method
+# Only include attribute 'name' from 'groups' table and 'name' and 'date' from marathons table
 class LogSchema(ma.Schema):
-    group = fields.Nested("UserSchema", only = ["name", "email"])
-    marathon = fields.Nested("MarathonSchema", only = ["name", "date"])
+    groups = fields.List(fields.Nested("GroupSchema", only = ["name"]))
+    marathons = fields.List(fields.Nested("MarathonSchema", only = ["name", "date"]))
     class Meta:
-        fields = ["id", "group", "marathon"]
+        fields = ["id", "groups", "marathons"]
 
 
 # Create schema objects to handle one or multiple items

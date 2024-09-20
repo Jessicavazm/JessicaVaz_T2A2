@@ -2,7 +2,7 @@ from init import db, ma
 from marshmallow import fields
 
 
-# Define workouts table
+# Define 'workouts' table
 class Workout(db.Model):
     __tablename__ = "workouts"
 
@@ -13,18 +13,20 @@ class Workout(db.Model):
     calories_burnt = db.Column(db.Integer)
 
     
-    # Foreign key
+    # Define FK to reference 'users' table
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
 
-    # Define bidirectional relationships
+    # Define bidirectional relationships with 'users' table
     user = db.relationship("User", back_populates = "workouts")
 
 
-# Define User Schema to serialize/ deserialized fields
+# Define 'workout' schema to serialize/ deserialize fields
 # Unpack complex data with fields.Nested method
+# Only include attribute 'name' from 'users' table to avoid redundant data
 class WorkoutSchema(ma.Schema):
     user = fields.Nested("UserSchema", only=["name"])
+    
     class Meta:
         fields = ["id", "date", "distance_kms", "duration_minutes", "calories_burnt", "user"]
 
