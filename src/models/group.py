@@ -2,10 +2,11 @@ from init import db, ma
 from marshmallow import fields
 
 
-# Define 'groups' table
 class Group(db.Model):
+    # Name of the table
     __tablename__ = "groups"
 
+    # Attributes
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     date_created = db.Column(db.Date)
@@ -23,7 +24,7 @@ class Group(db.Model):
     logs = db.relationship("Log", back_populates= "groups", cascade="all, delete")
 
 
-# Define Group Schema to serialize/ deserialize fields
+# Define 'group' schema and class 'Meta' fields to serialize/ deserialize data
 # Unpack complex data with fields.Nested method
 # Only include 'name' and 'email' from 'users' table and exclude 'group' from 'logs' table to avoid redundant data
 class GroupSchema(ma.Schema):

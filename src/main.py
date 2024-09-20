@@ -5,6 +5,7 @@ from flask import Flask
 from init import db, ma, bcrypt, jwt
 # Import blueprints to register them in the app
 from controllers.cli_controllers import db_commands
+from controllers.auth_controller import auth_bp
 
 
 # Define the app inside of an application factory function
@@ -21,6 +22,6 @@ def  create_app():
 
     # Register blueprints
     app.register_blueprint(db_commands)
-
+    app.register_blueprint(auth_bp)
 
     return app

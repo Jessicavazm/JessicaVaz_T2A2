@@ -2,10 +2,11 @@ from init import db, ma
 from marshmallow import fields
 
 
-# Define 'logs' table
 class Log(db.Model):
+    # Name of the table
     __tablename__ = "logs"
 
+    # Attributes
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date) 
     
@@ -19,8 +20,7 @@ class Log(db.Model):
     groups = db.relationship("Group", back_populates="logs")
     marathons = db.relationship("Marathon", back_populates="logs")
 
-
-# Define 'log' schema to serialize/ deserialize fields
+# Define 'log' schema and class 'Meta' fields to serialize/ deserialize data
 # Unpack complex data with fields.Nested method
 # Only include attribute 'name' from 'groups' table and 'name' and 'date' from marathons table
 class LogSchema(ma.Schema):

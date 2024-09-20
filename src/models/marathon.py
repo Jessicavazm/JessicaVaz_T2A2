@@ -2,10 +2,11 @@ from init import db, ma
 from marshmallow import fields
 
 
-# Define 'marathons' table
 class Marathon(db.Model):
+    # Name of the table
     __tablename__ = "marathons"
 
+    # Attributes
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     date = db.Column(db.Date, nullable=False)
@@ -17,8 +18,7 @@ class Marathon(db.Model):
     # Define bidirectional relationships with 'logs' table
     logs = db.relationship("Log", back_populates="marathons", cascade="all, delete")
 
-
-# Define 'marathons' schema to serialize/ deserialize fields
+# Define 'marathon' schema and class 'Meta' fields to serialize/ deserialize data
 # Unpack complex data with fields.Nested method
 # Only include attribute 'id' from 'logs' table to avoid redundant data
 class MarathonSchema(ma.Schema):
