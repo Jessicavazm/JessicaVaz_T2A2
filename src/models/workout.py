@@ -8,7 +8,7 @@ class Workout(db.Model):
 
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String)
+    title = db.Column(db.String, nullable=False)
     date = db.Column(db.Date, nullable=False)
     distance_kms = db.Column(db.Integer, nullable=False)
     calories_burnt = db.Column(db.Integer)

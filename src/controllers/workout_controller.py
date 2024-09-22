@@ -17,10 +17,15 @@ workout_bp = Blueprint("workout", __name__,url_prefix="/workout")
 @workout_bp.route("/")
 def get_all_workouts():
     # Create and execute stmt, order by descending order
+    # Convert workouts to list to use IF statement 
     stmt = db.select(Workout).order_by(Workout.date.desc())
-    workouts = db.session.scalars(stmt)
-    # Serialise data using workouts_schema
-    return workouts_schema.dump(workouts), 200
+    workouts = list(db.session.scalars(stmt))
+    if workouts:
+        # Serialise data using workouts_schema
+        return workouts_schema.dump(workouts), 200
+    # Else returns error message
+    else:
+        return {"Error": "No workouts to display."}, 400
 
 
 # Create route for 'GET' a specific workout
