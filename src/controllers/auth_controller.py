@@ -2,12 +2,11 @@ from datetime import timedelta
 
 from flask import Blueprint, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from sqlalchemy.exc import IntegrityError
+from psycopg2 import errorcodes
 
 from models.user import User, user_schema, UserSchema
 from init import db, bcrypt
-
-from sqlalchemy.exc import IntegrityError
-from psycopg2 import errorcodes
 
 
 # Create authorisation blueprint

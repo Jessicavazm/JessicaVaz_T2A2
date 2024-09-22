@@ -27,7 +27,6 @@ class User(db.Model):
 class UserSchema(ma.Schema):
     workouts = fields.List(fields.Nested("WorkoutSchema", exclude=["user"]))
     group = fields.Nested("GroupSchema", only=["name"])
-
     class Meta:
         fields = ["id", "name", "email", "password", "is_admin", "workouts", "group"]
 

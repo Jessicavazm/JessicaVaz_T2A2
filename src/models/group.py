@@ -30,7 +30,6 @@ class Group(db.Model):
 class GroupSchema(ma.Schema):
     users = fields.List(fields.Nested("UserSchema", only=["name", "email"]))
     logs = fields.List(fields.Nested("LogSchema", exclude=["group"]))
-
     class Meta:
         fields = ["id", "name", "date_created", "category_level", "members_capacity", "created_by", "users", "logs"]
 

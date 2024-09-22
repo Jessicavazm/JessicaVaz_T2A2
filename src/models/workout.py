@@ -27,7 +27,6 @@ class Workout(db.Model):
 # Only include attribute 'name' from 'users' table to avoid redundant data
 class WorkoutSchema(ma.Schema):
     user = fields.Nested("UserSchema", only=["name"])
-    
     class Meta:
         fields = ["id", "title", "date", "distance_kms", "calories_burnt", "user"]
 
