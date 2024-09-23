@@ -45,8 +45,7 @@ def register_group():
         # Create a new group instance
         group = Group(
             title=body_data.get("title"),
-            date_created=date.today(),
-            user_id = admin_id
+            date_created=date.today()
         )
         # Add and commit to the DB
         db.session.add(group)
