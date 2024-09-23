@@ -16,7 +16,7 @@ class Marathon(db.Model):
 
 
     # Define bidirectional relationships with 'logs' table
-    logs = db.relationship("Log", back_populates="marathons", cascade="all, delete")
+    logs = db.relationship("Log", back_populates="marathon", cascade="all, delete")
 
 # Define 'marathon' schema and class 'Meta' fields to serialize/ deserialize data
 # Unpack complex data with fields.Nested method

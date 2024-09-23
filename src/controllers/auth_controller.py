@@ -19,15 +19,13 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 def get_all_users():
     try:    
         # Create and execute stmt, order by ascending name
-        stmt = db.select(User.name, User.email, User.id).order_by(User.name.asc())
+        stmt = db.select(User.name, User.email, User.id, User.group_id).order_by(User.name.asc())
         users = db.session.execute(stmt).all()
-        
         # Check if users exist
         if users:
-            return [{"name": user.name, "email": user.email, "id": user.id} for user in users], 200
+            return [{"name": user.name, "email": user.email, "id": user.id, "Group": user.group_id} for user in users], 200
         else:
             return {"Error": "No users to display."}, 400
-
     except SQLAlchemyError as e:
         return {"Error": str(e)}, 500
 

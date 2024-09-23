@@ -34,11 +34,13 @@ def seed_tables():
         User(
             name = "User B",
             email = "user_b@email.com",
-            password = bcrypt.generate_password_hash("123456").decode("utf-8")
+            password = bcrypt.generate_password_hash("123456").decode("utf-8"),
+            is_admin = False
         )
     ]
     # Add created users to DB
     db.session.add_all(users)
+    db.session.commit()
     
 
     workouts = [
@@ -47,38 +49,38 @@ def seed_tables():
         date = date.today(),
         distance_kms = 10,
         calories_burnt = 235,
-        user = users[0]
+        user_id=users[0].id
     ), Workout(
         title = "Running with friend",
         date = date.today(),
         distance_kms = 10,
         calories_burnt = 250,
-        user = users[1]
+        user_id=users[1].id
     )]
     # Add created workouts to DB
     db.session.add_all(workouts)
+    db.session.commit()
 
 
     groups = [
             Group(
-                name = "Group A",
-                date_created = date.today(),
-                experience_level = "Intermediate",
-                members_capacity = 5,
-                created_by = "Jess",
-                user = users[1]
+                title = "Group A",
+                date_created = date.today()
             ), 
             Group(
-                name = "Group B",
-                date_created = date.today(),
-                experience_level = "Advanced",
-                members_capacity = 3,
-                created_by = "Iryna",
-                user = users[0]
+                title = "Group B",
+                date_created = date.today()
             )
         ]
     # Add created groups to DB
     db.session.add_all(groups)
+    db.session.commit()
+
+
+    users[0].group_id = groups[0].id  # User A joins Group A
+    users[1].group_id = groups[1].id  # User B joins Group B
+    # Commit user group assignments
+    db.session.commit()  
 
 
     marathons = [

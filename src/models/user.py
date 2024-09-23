@@ -14,19 +14,21 @@ class User(db.Model):
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    # FK to reference the groups table
+    group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
     
     # Define bidirectional relationships with 'workouts' and 'groups' tables.
     workouts = db.relationship("Workout", back_populates = "user", cascade="all, delete")
-    group = db.relationship("Group", back_populates= "user", cascade="all, delete")
+    group = db.relationship("Group", back_populates= "users", cascade="all, delete")
 
 
 # Define 'user' schema and class 'Meta' fields to serialize/ deserialize data
 # Unpack complex data with fields.Nested method
-# Exclude 'user' from 'workouts' table, and only add 'name' from 'groups' table to avoid redundant data
+# Exclude 'user' from 'workouts' table, and only add 'title' from 'groups' table to avoid redundant data
 class UserSchema(ma.Schema):
     workouts = fields.List(fields.Nested("WorkoutSchema", exclude=["user"]))
-    group = fields.Nested("GroupSchema", only=["name"])
+    group = fields.Nested("GroupSchema", only=["title"])
     class Meta:
         fields = ["id", "name", "email", "password", "is_admin", "workouts", "group"]
 
