@@ -7,26 +7,25 @@ from psycopg2 import errorcodes
 
 from init import db
 from models.group import Group, GroupSchema, group_schema, groups_schema
+from models.user import User
 from utils import auth_as_admin_decorator
 
 # Create workout blueprint
 group_bp = Blueprint("group", __name__,url_prefix="/group")
 
 
-# Create route for see all groups, 'GET' method
 @group_bp.route("/")
 def get_all_groups():
-    try:    
-        # Create and execute stmt, order by ascending title
-        stmt = db.select(Group.title, Group.members_capacity, Group.created_by).order_by(Group.title.asc())
-        groups = db.session.execute(stmt).all()
-        # Check if groups exist, display title and group's capacity, Else returns error msg
-        if groups:
-            return [{"title": group.title, "Members capacity": group.members_capacity, "Created_by": group.created_by} for group in groups], 200
-        else:
-            return {"Error": "No groups created."}, 400
-    except SQLAlchemyError as e:
-        return {"Error": str(e)}, 500
+    # Create and execute stmt, order by asc order
+    # Convert groups to list to use IF statement 
+    stmt = db.select(Group).order_by(Group.title.asc())
+    groups = list(db.session.scalars(stmt))
+    if groups:
+        # Serialise data using groups_schema
+        return groups_schema.dump(groups), 200
+    # Else returns error message
+    else:
+        return {"Error": "No groups to display."}, 400
 
 
 # Create 'register' group route,'POST' method to insert data into DB
@@ -38,8 +37,8 @@ def register_group():
     try:
         # Fetch admin's id and ensure they haven't created a group yet
         admin_id = get_jwt_identity()
-        existing_group = Group.query.filter_by(user_id=admin_id)
-        if existing_group:
+        existing_group = User.query.filter_by(id=admin_id).first()
+        if existing_group and existing_group.group_id:
             return {"error": "You have created a group already."}, 400
         # Get the fields from the body of the request, deserialize using group_schema
         body_data = group_schema.load(request.get_json())
@@ -47,9 +46,7 @@ def register_group():
         group = Group(
             title=body_data.get("title"),
             date_created=date.today(),
-            members_capacity=body_data.get("members_capacity"),
-            created_by=body_data.get("created_by"),
-            user_id=admin_id
+            user_id = admin_id
         )
         # Add and commit to the DB
         db.session.add(group)
@@ -77,12 +74,11 @@ def update_group(group_id):
         # If group exist, edit required fields, ELSE returns error msg
         if group:
             group.title = body_data.get("title") or group.title
-            group.members_capacity = body_data.get("members_capacity") or group.members_capacity
-            # Commit changes to DB, return updated workout
+            # Commit changes to DB, return updated group
             db.session.commit()
             return group_schema.dump(group)
         else:
-            return {"error": f"Workout with id {group_id} has not been found."}, 404
+            return {"error": f"Group with id {group_id} has not been found."}, 404
 
 
 # Create route for deleting group, JWT required
@@ -98,6 +94,36 @@ def delete_group(group_id):
     if group:    
         db.session.delete(group)
         db.session.commit()
-        return {"message": f"group {group_id} has been deleted successfully!"}, 200
+        return {"message": f"Group {group_id} has been deleted successfully!"}, 200
     else:
-        return {"error": f"Workout {group_id} has been not found."}, 404
+        return {"error": f"Group {group_id} has been not found."}, 404
+    
+
+@group_bp.route("/signup/<int:group_id>", methods=["POST"])
+@jwt_required()
+def signup_group(group_id):
+    try:
+        # Fetch user ID from JWT
+        user_id = get_jwt_identity() 
+        user = User.query.get(user_id)
+
+        # Check if the user is already part of a group
+        if user.group_id is not None:
+            return {"error": "You are part of a group already."}, 400
+        
+        # Fetch the group instance
+        group = Group.query.get(group_id)
+        if not group:
+            return {"error": "Group not found."}, 404
+        
+        # Add the user to the group
+        user.group_id = group_id
+        db.session.commit()
+        return {"message": f"You have been added to group {group_id} successfully."}, 201  
+    # Handles errors
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+
+
+

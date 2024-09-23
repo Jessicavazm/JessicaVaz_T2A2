@@ -9,17 +9,11 @@ class Group(db.Model):
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
-    date_created = db.Column(db.Date)
-    members_capacity = db.Column(db.Integer, nullable=False)
-    created_by = db.Column(db.String(50), nullable=False)
-
-    
-    # Foreign key to reference 'users' table
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    date_created = db.Column(db.Date, nullable=False)
 
 
     # Define bidirectional relationships with 'users' and 'logs' tables
-    user = db.relationship("User", back_populates= "group")
+    users = db.relationship("User", back_populates= "group")
     logs = db.relationship("Log", back_populates= "group", cascade="all, delete")
 
 
@@ -30,7 +24,7 @@ class GroupSchema(ma.Schema):
     users = fields.List(fields.Nested("UserSchema", only=["name", "email"]))
     logs = fields.List(fields.Nested("LogSchema", exclude=["group"]))
     class Meta:
-        fields = ["id", "title", "date_created", "members_capacity", "created_by", "users", "logs"]
+        fields = ["id", "title", "date_created", "users", "logs"]
 
 
 # Create schema objects to handle one or multiple items 
