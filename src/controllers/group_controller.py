@@ -35,27 +35,37 @@ def get_all_groups():
 @auth_as_admin_decorator
 def register_group():
     try:
-        # Fetch admin's id and ensure they haven't created a group yet
+        # Fetch admin's id
         admin_id = get_jwt_identity()
-        existing_group = User.query.filter_by(id=admin_id).first()
-        if existing_group and existing_group.group_id:
-            return {"error": "You have created a group already."}, 400
-        # Get the fields from the body of the request, deserialize using group_schema
+        existing_user = User.query.get(admin_id)  # Get the user directly
+
+        # Check if the user already has a group
+        if existing_user.group_id:
+            return {"error": "You have already created a group."}, 400
+
+        # Get the fields from the request
         body_data = group_schema.load(request.get_json())
+        
         # Create a new group instance
         group = Group(
             title=body_data.get("title"),
             date_created=date.today()
         )
-        # Add and commit to the DB
+        
+        # Add and commit to the database
         db.session.add(group)
         db.session.commit()
+
+        # Update the user's group_id
+        existing_user.group_id = group.id
+        db.session.commit()
+
         # Return acknowledgment message
         return group_schema.dump(group), 201
-    # Return not null violation personalised message   
+
     except IntegrityError as err:
         if err.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
-            return{"error": f"The column {err.orig.diag.column_name} is required"}, 400
+            return {"error": f"The column {err.orig.diag.column_name} is required"}, 400
     except Exception as e:
         return {"error": str(e)}, 500
     
@@ -122,7 +132,3 @@ def signup_group(group_id):
     # Handles errors
     except Exception as e:
         return {"error": str(e)}, 500
-
-
-
-
