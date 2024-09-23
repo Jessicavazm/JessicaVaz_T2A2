@@ -61,17 +61,15 @@ def seed_tables():
 
     groups = [
             Group(
-                name = "Group A",
+                title = "Group A",
                 date_created = date.today(),
-                experience_level = "Intermediate",
                 members_capacity = 5,
                 created_by = "Jess",
                 user = users[1]
             ), 
             Group(
-                name = "Group B",
+                title = "Group B",
                 date_created = date.today(),
-                experience_level = "Advanced",
                 members_capacity = 3,
                 created_by = "Iryna",
                 user = users[0]

@@ -17,17 +17,17 @@ class Log(db.Model):
 
 
     # Define bidirectional relationships with 'groups' and 'marathons' tables
-    groups = db.relationship("Group", back_populates="logs")
-    marathons = db.relationship("Marathon", back_populates="logs")
+    group = db.relationship("Group", back_populates="logs")
+    marathon = db.relationship("Marathon", back_populates="logs")
 
 # Define 'log' schema and class 'Meta' fields to serialize/ deserialize data
 # Unpack complex data with fields.Nested method
 # Only include attribute 'name' from 'groups' table and 'name' and 'date' from marathons table
 class LogSchema(ma.Schema):
-    groups = fields.List(fields.Nested("GroupSchema", only = ["name"]))
-    marathons = fields.List(fields.Nested("MarathonSchema", only = ["name", "date"]))
+    group = (fields.Nested("GroupSchema", only = ["title"]))
+    marathon = (fields.Nested("MarathonSchema", only = ["name", "date"]))
     class Meta:
-        fields = ["id", "groups", "marathons"]
+        fields = ["id", "group", "marathon"]
 
 
 # Create schema objects to handle one or multiple items

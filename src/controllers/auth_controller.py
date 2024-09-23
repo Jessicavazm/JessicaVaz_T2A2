@@ -21,13 +21,11 @@ def get_all_users():
         # Create and execute stmt, order by ascending name
         stmt = db.select(User.name, User.email, User.id).order_by(User.name.asc())
         users = db.session.execute(stmt).all()
-        
         # Check if users exist
         if users:
             return [{"name": user.name, "email": user.email, "id": user.id} for user in users], 200
         else:
             return {"Error": "No users to display."}, 400
-
     except SQLAlchemyError as e:
         return {"Error": str(e)}, 500
 

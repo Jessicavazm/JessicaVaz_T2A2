@@ -26,7 +26,7 @@ class User(db.Model):
 # Exclude 'user' from 'workouts' table, and only add 'name' from 'groups' table to avoid redundant data
 class UserSchema(ma.Schema):
     workouts = fields.List(fields.Nested("WorkoutSchema", exclude=["user"]))
-    group = fields.Nested("GroupSchema", only=["name"])
+    group = fields.Nested("GroupSchema", only=["title"])
     class Meta:
         fields = ["id", "name", "email", "password", "is_admin", "workouts", "group"]
 

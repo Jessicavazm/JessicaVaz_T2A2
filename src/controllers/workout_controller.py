@@ -5,8 +5,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
 
+from init import db
 from models.workout import Workout, workout_schema, workouts_schema, WorkoutSchema
-from init import db, bcrypt
 
 
 # Create workout blueprint
@@ -73,7 +73,7 @@ def register_workout():
 @workout_bp.route("/<int:workout_id>", methods = ["PUT", "PATCH"])
 @jwt_required()
 def update_workout(workout_id):
-# Get the fields from body of the request, partial=True to update partial data
+    # Get the fields from body of the request, partial=True to update partial data
     body_data = workout_schema.load(request.get_json(), partial=True)
     stmt = db.select(Workout).filter_by(id=workout_id)
     workout = db.session.scalar(stmt)
