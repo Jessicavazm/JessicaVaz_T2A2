@@ -65,16 +65,16 @@ def register_group():
     
 
 # Create route for updating group info, "PATCH" to insert data into DB
+# @auth_as_admin decorator to ensure only admin can perform this action
 @group_bp.route("/<int:group_id>", methods = ["PUT", "PATCH"])
 @jwt_required()
-# Ensure only admin can perform this action
 @auth_as_admin_decorator
 def update_group(group_id):
         # Get the fields from body of the request, partial=True to update partial data
         body_data = group_schema.load(request.get_json(), partial=True)
         stmt = db.select(Group).filter_by(id=group_id)
         group = db.session.scalar(stmt)
-        # If group exist, edit required fields, ELSE returns error message
+        # If group exist, edit required fields, ELSE returns error msg
         if group:
             group.title = body_data.get("title") or group.title
             group.members_capacity = body_data.get("members_capacity") or group.members_capacity
@@ -83,3 +83,21 @@ def update_group(group_id):
             return group_schema.dump(group)
         else:
             return {"error": f"Workout with id {group_id} has not been found."}, 404
+
+
+# Create route for deleting group, JWT required
+# @auth_as_admin decorator to ensure only admin can perform this action
+@group_bp.route("/<int:group_id>", methods=["DELETE"])
+@jwt_required()
+@auth_as_admin_decorator
+def delete_group(group_id):
+    # Fetch the group from DB with stmt
+    stmt = db.select(Group).filter_by(id=group_id)
+    group = db.session.scalar(stmt)
+    # If group exist delete it, ELSE returns error msg
+    if group:    
+        db.session.delete(group)
+        db.session.commit()
+        return {"message": f"group {group_id} has been deleted successfully!"}, 200
+    else:
+        return {"error": f"Workout {group_id} has been not found."}, 404
