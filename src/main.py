@@ -12,6 +12,7 @@ from controllers.cli_controllers import db_commands
 from controllers.auth_controller import auth_bp
 from controllers.workout_controller import workout_bp
 from controllers.group_controller import group_bp
+from controllers.marathon_controller import marathon_bp
 
 
 # Define the app inside of an application factory function
@@ -31,6 +32,7 @@ def  create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(workout_bp)
     app.register_blueprint(group_bp)
+    app.register_blueprint(marathon_bp)
 
 
     return app

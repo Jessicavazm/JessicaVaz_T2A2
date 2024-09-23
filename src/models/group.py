@@ -8,7 +8,7 @@ class Group(db.Model):
 
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
     date_created = db.Column(db.Date)
 
 
@@ -24,7 +24,7 @@ class GroupSchema(ma.Schema):
     users = fields.List(fields.Nested("UserSchema", only=["name", "email"]))
     logs = fields.List(fields.Nested("LogSchema", exclude=["group"]))
     class Meta:
-        fields = ["id", "title", "date_created", "users", "logs"]
+        fields = ["id", "name", "date_created", "users", "logs"]
 
 
 # Create schema objects to handle one or multiple items 
