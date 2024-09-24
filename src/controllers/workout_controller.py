@@ -31,8 +31,7 @@ def get_all_workouts():
 # Create route for 'GET' a specific workout
 @workout_bp.route("/<int:workout_id>")
 def get_a_workout(workout_id):
-    # Use filter_by to select a specific card
-    # stmt = db.select(Card).where(Card.id==card_id)
+    # Use stmt and filter_by to select a specific workout
     stmt = db.select(Workout).filter_by(id=workout_id)
     workout = db.session.scalar(stmt)
     # If workout returns workout, Else returns error message

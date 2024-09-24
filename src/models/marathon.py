@@ -21,7 +21,7 @@ class Marathon(db.Model):
 # Unpack complex data with fields.Nested method
 # Only include attribute 'id' from 'logs' table to avoid redundant data
 class MarathonSchema(ma.Schema):
-    logs = fields.List(fields.Nested("LogSchema", only=["id"]))
+    logs = fields.List(fields.Nested("LogSchema", only=["id", "entry_created"]))
     class Meta:
         fields = ["id", "name", "date", "location", "distance_kms", "logs"]
 
