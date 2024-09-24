@@ -109,12 +109,12 @@ def seed_tables():
     # Add marathon_logs to logs tables
     logs = [
             Log(
-                date = date.today(),
+                entry_created = date.today(),
                 group_id=groups[1].id,  
                 marathon_id=marathons[1].id 
             ), 
             Log(
-                date = date.today(),
+                entry_created = date.today(),
                 group_id=groups[0].id,  
                 marathon_id=marathons[0].id 
             )

@@ -8,7 +8,7 @@ class Log(db.Model):
 
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date) 
+    entry_created = db.Column(db.Date) 
     
 
     # Foreign keys to reference both 'groups' and 'marathons' tables
@@ -24,10 +24,10 @@ class Log(db.Model):
 # Unpack complex data with fields.Nested method
 # Only include attribute 'name' from 'groups' table and 'name' and 'date' from marathons table
 class LogSchema(ma.Schema):
-    group = (fields.Nested("GroupSchema", only = ["title"]))
+    group = (fields.Nested("GroupSchema", only = ["name"]))
     marathon = (fields.Nested("MarathonSchema", only = ["name", "date"]))
     class Meta:
-        fields = ["id", "group", "marathon"]
+        fields = ["id", "entry_created", "group", "marathon"]
 
 
 # Create schema objects to handle one or multiple items

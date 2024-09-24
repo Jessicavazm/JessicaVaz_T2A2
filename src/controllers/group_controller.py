@@ -8,6 +8,9 @@ from psycopg2 import errorcodes
 from init import db
 from models.group import Group, GroupSchema, group_schema, groups_schema
 from models.user import User
+from models.marathon import Marathon, marathon_schema, MarathonSchema, marathons_schema
+from models.log import Log, log_schema
+
 from utils import auth_as_admin_decorator
 
 # Create workout blueprint
@@ -106,28 +109,45 @@ def delete_group(group_id):
         return {"error": f"Group {group_id} has been not found."}, 404
     
 
-# Create route for users to enrol in a group, JWT required
-@group_bp.route("/signup/<int:group_id>", methods=["POST"])
+# Create route for admins to enrol their group in marathons events, JWT required
+# POST method to insert data in DB
+@group_bp.route("/marathon_signup/<int:marathon_id>", methods=["POST"])
 @jwt_required()
-def signup_group(group_id):
+@auth_as_admin_decorator
+def signup_marathon(marathon_id):
     try:
-        # Fetch user ID from JWT
-        user_id = get_jwt_identity() 
-        user = User.query.get(user_id)
+        # Get the admin using JWT 
+        admin_id = get_jwt_identity()
+        admin_user = User.query.get(admin_id) 
 
-        # Check if the user is already part of a group
-        if user.group_id is not None:
-            return {"error": "You are part of a group already."}, 400
-        
-        # Fetch the group instance
-        group = Group.query.get(group_id)
+        # Get the group associated with the admin
+        group = Group.query.get(admin_user.group_id)
         if not group:
-            return {"error": "Group not found."}, 404
+            return {"error": "Group not found, try creating a group first."}, 404
+
+        # Check if the marathon exists
+        marathon = Marathon.query.get(marathon_id)
+        if not marathon:
+            return {"error": "Marathon not found."}, 404
         
-        # Add the user to the group
-        user.group_id = group_id
+        # Check if the group is already signed up for this marathon
+        existing_log = Log.query.filter_by(group_id=group.id, marathon_id=marathon_id).first()
+        if existing_log:
+            return {"error": "This group is already enrolled in this marathon."}, 400
+
+        # Create the log entry
+        log_entry = Log(
+            entry_created=date.today(),
+            group_id=group.id,
+            marathon_id=marathon_id  
+        )
+
+        # Add the log entry to the database
+        db.session.add(log_entry)
         db.session.commit()
-        return {"message": f"You have been added to group {group_id} successfully."}, 201  
-    # Handles errors
+
+        # Return a success message
+        return log_schema.dump(log_entry), 201
+
     except Exception as e:
         return {"error": str(e)}, 500
