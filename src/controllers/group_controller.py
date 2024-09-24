@@ -164,3 +164,31 @@ def signup_marathon(marathon_id):
 
     except Exception as e:
         return {"error": str(e)}, 500
+
+
+# Create route for users to enrol in a group, JWT required
+# POST method to insert data in DB
+@group_bp.route("/join_group/<int:group_id>", methods=["POST"])
+@jwt_required()
+def signup_group(group_id):
+    try:
+        # Fetch user ID from JWT
+        user_id = get_jwt_identity() 
+        user = User.query.get(user_id)
+
+        # Check if the user is already part of a group
+        if user.group_id is not None:
+            return {"error": "You are part of a group already."}, 400
+        
+        # Fetch the group instance
+        group = Group.query.get(group_id)
+        if not group:
+            return {"error": "Group not found."}, 404
+        
+        # Add the user to the group
+        user.group_id = group_id
+        db.session.commit()
+        return {"message": f"You have been added to group {group_id} successfully."}, 201  
+    # Handles errors
+    except Exception as e:
+        return {"error": str(e)}, 500

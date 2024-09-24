@@ -19,6 +19,7 @@ from controllers.log_controller import log_bp
 # Define the app inside of an application factory function
 def  create_app():
     app = Flask(__name__)
+    app.json.sort_keys = False
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
     app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 

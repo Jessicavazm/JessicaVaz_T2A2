@@ -18,20 +18,21 @@ class User(db.Model):
     # FK to reference the groups table
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
-
-    # Define bidirectional relationships with 'workouts' and 'groups' tables.
+    # Define bidirectional relationships with 'workouts' and 'groups' tables
+    # Cascade to delete workouts and group if user is deleted
     workouts = db.relationship("Workout", back_populates = "user", cascade="all, delete")
     group = db.relationship("Group", back_populates= "users", cascade="all, delete")
 
 
 # Define 'user' schema and class 'Meta' fields to serialize/ deserialize data
-# Unpack complex data with fields.Nested method
+# Unpack complex data with fields.Nested method, fields.List to unpack a list of workouts
 # Exclude 'user' from 'workouts' table, and only add 'name' from 'groups' table to avoid redundant data
 class UserSchema(ma.Schema):
     workouts = fields.List(fields.Nested("WorkoutSchema", exclude=["user"]))
-    group = fields.Nested("GroupSchema", only=["name"])
+    group = fields.Nested("GroupSchema", only=["id", "name"])
     class Meta:
         fields = ["id", "name", "email", "password", "is_admin", "workouts", "group"]
+        ordered = True 
 
 
 # Create schema objects to handle one or multiple items

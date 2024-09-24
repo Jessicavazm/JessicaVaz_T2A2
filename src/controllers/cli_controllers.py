@@ -48,26 +48,27 @@ def seed_tables():
             email = "admin_a@email.com",
             password = bcrypt.generate_password_hash("123456").decode("utf-8"),
             is_admin = True,
-            group_id=groups[0].id
+            group=groups[0]
         ), 
         User(
             name = "User B",
             email = "user_b@email.com",
             password = bcrypt.generate_password_hash("123456").decode("utf-8"),
             is_admin = True,
-            group_id=groups[0].id,
+            group=groups[0]
+
         ),
         User(
             name = "User C",
             email = "user_c@email.com",
             password = bcrypt.generate_password_hash("123456").decode("utf-8"),
-            group_id=groups[1].id,
+            group=groups[1]
+
         )
     ]
     # Add created users to DB
     db.session.add_all(users)
-    db.session.commit()
-    
+
 
     # Add workouts to workouts table
     workouts = [
@@ -76,17 +77,16 @@ def seed_tables():
         date = date.today(),
         distance_kms = 10,
         calories_burnt = 235,
-        user_id=users[0].id
+        user=users[0]
     ), Workout(
         title = "Running with friend",
         date = date.today(),
         distance_kms = 10,
         calories_burnt = 250,
-        user_id=users[1].id
+        user=users[1]
     )]
     # Add created workouts to DB
     db.session.add_all(workouts)
-    db.session.commit()
 
 
     # Add marathon events to marathons tables
@@ -106,24 +106,24 @@ def seed_tables():
         ]
     # Add created marathons to DB and commit changes all changes above to DB
     db.session.add_all(marathons)
-    db.session.commit()
 
 
     # Add marathon_logs to logs tables
     logs = [
             Log(
                 entry_created = date.today(),
-                group_id=groups[0].id ,  
-                marathon_id=marathons[1].id 
+                group=groups[0],  
+                marathon=marathons[1]
             ), 
             Log(
                 entry_created = date.today(),
-                group_id=groups[1].id,  
-                marathon_id=marathons[0].id 
+                group=groups[1],  
+                marathon=marathons[0]
             )
         ]
     # Add created logs and commit changes to DB
     db.session.add_all(logs)
+    # Commit all changes
     db.session.commit()
     
     print("Tables seeded!")

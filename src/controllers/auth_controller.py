@@ -15,7 +15,7 @@ from utils import auth_as_admin_decorator
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-# Create route to see all users (only name & email)
+# Create route to see all users (only name, email and group_id)
 @auth_bp.route("/users")
 def get_all_users():
     try:    
@@ -31,7 +31,7 @@ def get_all_users():
         return {"Error": str(e)}, 500
 
 
-# Create 'register' route, use "POST" since data will be inserted to DB
+# Create user 'register' route, use "POST" since data will be inserted to DB
 @auth_bp.route("/register", methods=["POST"])
 def register_user():
     try:    
@@ -59,7 +59,7 @@ def register_user():
             return {"error": "Email address must be unique"}, 400
 
 
-# Create 'login' route
+# Create user 'login' route
 @auth_bp.route("/login", methods = ["POST"])
 def login_user():
     # Get data from request body
@@ -122,29 +122,3 @@ def delete_user(user_id):
         return {"message": f"User with id {user_id} has not been found."}
 
 
-# Create route for users to enrol in a group, JWT required
-# POST method to insert data in DB
-@auth_bp.route("/signup/<int:group_id>", methods=["POST"])
-@jwt_required()
-def signup_group(group_id):
-    try:
-        # Fetch user ID from JWT
-        user_id = get_jwt_identity() 
-        user = User.query.get(user_id)
-
-        # Check if the user is already part of a group
-        if user.group_id is not None:
-            return {"error": "You are part of a group already."}, 400
-        
-        # Fetch the group instance
-        group = Group.query.get(group_id)
-        if not group:
-            return {"error": "Group not found."}, 404
-        
-        # Add the user to the group
-        user.group_id = group_id
-        db.session.commit()
-        return {"message": f"You have been added to group {group_id} successfully."}, 201  
-    # Handles errors
-    except Exception as e:
-        return {"error": str(e)}, 500

@@ -77,11 +77,8 @@ def register_marathon():
         return {"error": "Invalid date format. Use YYYY-MM-DD."}, 400
 
 
-# Create route for updating marathon JWT required
+# Create route for updating marathon, JWT required
 # @auth_as_admin to only authorise admins to perform this
-from datetime import datetime, date
-from sqlalchemy.exc import IntegrityError
-
 @marathon_bp.route("/<int:marathon_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 @auth_as_admin_decorator

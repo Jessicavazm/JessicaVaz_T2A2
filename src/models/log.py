@@ -21,12 +21,14 @@ class Log(db.Model):
 
 # Define 'log' schema and class 'Meta' fields to serialize/ deserialize data
 # Unpack complex data with fields.Nested method
-# Only include attribute 'name' from 'groups' table and 'name' and 'date' from marathons table
+# Only include attribute 'name' from 'groups' table
+# Exclude logs from marathon schema to avoid redundant data info
 class LogSchema(ma.Schema):
-    group = fields.Nested("GroupSchema", only = ["name"])
+    group = fields.Nested("GroupSchema", only =["id","name"])
     marathon = fields.Nested("MarathonSchema", exclude=["logs"])
     class Meta:
         fields = ["id", "entry_created", "group", "marathon"]
+        ordered = True
 
 
 # Create schema objects to handle one or multiple items

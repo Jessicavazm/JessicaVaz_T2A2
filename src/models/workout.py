@@ -13,10 +13,8 @@ class Workout(db.Model):
     distance_kms = db.Column(db.Integer, nullable=False)
     calories_burnt = db.Column(db.Integer)
 
-    
     # Define FK to reference 'users' table
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-
 
     # Define bidirectional relationships with 'users' table
     user = db.relationship("User", back_populates = "workouts")
@@ -26,9 +24,10 @@ class Workout(db.Model):
 # Unpack complex data with fields.Nested method
 # Only include attribute 'name' from 'users' table to avoid redundant data
 class WorkoutSchema(ma.Schema):
-    user = fields.Nested("UserSchema", only=["name"])
+    user = fields.Nested("UserSchema", only=["id", "name"])
     class Meta:
         fields = ["id", "title", "date", "distance_kms", "calories_burnt", "user"]
+        ordered = True
 
 
 # Create schema objects to handle one or multiple items
