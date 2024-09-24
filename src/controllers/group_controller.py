@@ -18,7 +18,7 @@ group_bp = Blueprint("group", __name__,url_prefix="/group")
 def get_all_groups():
     # Create and execute stmt, order by asc order
     # Convert groups to list to use IF statement 
-    stmt = db.select(Group).order_by(Group.title.asc())
+    stmt = db.select(Group).order_by(Group.name.asc())
     groups = list(db.session.scalars(stmt))
     if groups:
         # Serialise data using groups_schema
@@ -35,20 +35,18 @@ def get_all_groups():
 @auth_as_admin_decorator
 def register_group():
     try:
-        # Fetch admin's id
+        # Get the admin using JWT 
         admin_id = get_jwt_identity()
-        existing_user = User.query.get(admin_id)  # Get the user directly
+        admin_user = User.query.get(admin_id)  
 
-        # Check if the user already has a group
-        if existing_user.group_id:
+        # Check if admin already has a group
+        if admin_user.group_id:
             return {"error": "You have already created a group."}, 400
 
-        # Get the fields from the request
+        # Get the fields from the request and create a new group
         body_data = group_schema.load(request.get_json())
-        
-        # Create a new group instance
         group = Group(
-            title=body_data.get("title"),
+            name=body_data.get("name"),
             date_created=date.today()
         )
         
@@ -57,7 +55,7 @@ def register_group():
         db.session.commit()
 
         # Update the user's group_id
-        existing_user.group_id = group.id
+        admin_user.group_id = group.id
         db.session.commit()
 
         # Return acknowledgment message
@@ -82,7 +80,7 @@ def update_group(group_id):
         group = db.session.scalar(stmt)
         # If group exist, edit required fields, ELSE returns error msg
         if group:
-            group.title = body_data.get("title") or group.title
+            group.name = body_data.get("name") or group.name
             # Commit changes to DB, return updated group
             db.session.commit()
             return group_schema.dump(group)
@@ -108,6 +106,7 @@ def delete_group(group_id):
         return {"error": f"Group {group_id} has been not found."}, 404
     
 
+# Create route for users to enrol in a group, JWT required
 @group_bp.route("/signup/<int:group_id>", methods=["POST"])
 @jwt_required()
 def signup_group(group_id):

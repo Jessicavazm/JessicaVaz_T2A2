@@ -10,9 +10,8 @@ class Marathon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    city = db.Column(db.String(100), nullable=False)
+    location = db.Column(db.String(100), nullable=False)
     distance_kms = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.String(250))
 
 
     # Define bidirectional relationships with 'logs' table
@@ -24,7 +23,7 @@ class Marathon(db.Model):
 class MarathonSchema(ma.Schema):
     logs = fields.List(fields.Nested("LogSchema", only=["id"]))
     class Meta:
-        fields = ["id", "name", "date", "city", "distance_kms", "description", "logs"]
+        fields = ["id", "name", "date", "location", "distance_kms", "logs"]
 
 
 # Create schema objects to handle one or multiple items

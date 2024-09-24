@@ -24,6 +24,7 @@ def create_tables():
 # Command to seed the tables
 @db_commands.cli.command("seed")
 def seed_tables():
+    # Add users to users table
     users = [
         User(
             name = "User A",
@@ -35,14 +36,21 @@ def seed_tables():
             name = "User B",
             email = "user_b@email.com",
             password = bcrypt.generate_password_hash("123456").decode("utf-8"),
-            is_admin = False
+            is_admin = True
+        ),
+        User(
+            name = "User C",
+            email = "user_c@email.com",
+            password = bcrypt.generate_password_hash("123456").decode("utf-8"),
         )
+
     ]
     # Add created users to DB
     db.session.add_all(users)
     db.session.commit()
     
 
+    # Add workouts to workouts table
     workouts = [
         Workout(
         title = "Running with friend",
@@ -62,13 +70,14 @@ def seed_tables():
     db.session.commit()
 
 
+    # Add running groups to groups table
     groups = [
             Group(
-                title = "Group A",
+                name = "Group A",
                 date_created = date.today()
             ), 
             Group(
-                title = "Group B",
+                name = "Group B",
                 date_created = date.today()
             )
         ]
@@ -77,26 +86,19 @@ def seed_tables():
     db.session.commit()
 
 
-    users[0].group_id = groups[0].id  # User A joins Group A
-    users[1].group_id = groups[1].id  # User B joins Group B
-    # Commit user group assignments
-    db.session.commit()  
-
-
+    # Add marathon events to marathons tables
     marathons = [
             Marathon(
                 name = "Marathon A",
                 date = date.today(), 
-                city = "Gold Coast",
-                distance_kms = 10,
-                description = "Marathon for all levels"
+                location = "Gold Coast",
+                distance_kms = 10
             ), 
             Marathon(
                 name = "Marathon B",
                 date = date.today(),
-                city = "Melbourne",
-                distance_kms = 20,
-                description = "Marathon for advanced level"
+                location = "Melbourne",
+                distance_kms = 20
             )
         ]
     # Add created marathons to DB and commit changes all changes above to DB
@@ -104,6 +106,7 @@ def seed_tables():
     db.session.commit()
 
 
+    # Add marathon_logs to logs tables
     logs = [
             Log(
                 date = date.today(),

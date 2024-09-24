@@ -14,6 +14,7 @@ class User(db.Model):
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    
     # FK to reference the groups table
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
@@ -28,9 +29,9 @@ class User(db.Model):
 # Exclude 'user' from 'workouts' table, and only add 'title' from 'groups' table to avoid redundant data
 class UserSchema(ma.Schema):
     workouts = fields.List(fields.Nested("WorkoutSchema", exclude=["user"]))
-    group = fields.Nested("GroupSchema", only=["title"])
+    group = fields.Nested("GroupSchema", only=["name"])
     class Meta:
-        fields = ["id", "name", "email", "password", "is_admin", "workouts", "group"]
+        fields = ["id", "name", "email", "password", "is_admin", "group_id", "workouts", "group"]
 
 
 # Create schema objects to handle one or multiple items
