@@ -46,7 +46,7 @@ def register_group():
         # Get the fields from the request and create a new group
         body_data = group_schema.load(request.get_json())
         group = Group(
-            name=body_data.get("title"),
+            name=body_data.get("name"),
             date_created=date.today()
         )
         
@@ -106,6 +106,7 @@ def delete_group(group_id):
         return {"error": f"Group {group_id} has been not found."}, 404
     
 
+# Create route for users to enrol in a group, JWT required
 @group_bp.route("/signup/<int:group_id>", methods=["POST"])
 @jwt_required()
 def signup_group(group_id):

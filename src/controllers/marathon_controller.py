@@ -94,3 +94,5 @@ def delete_marathon(marathon_id):
         return {"message": f"Marathon {marathon_id} has been deleted successfully!"}, 200
     else:
         return {"error": f"Marathon {marathon_id} has been not found."}, 404
+    
+
