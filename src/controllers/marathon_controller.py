@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -36,11 +36,19 @@ def register_marathon():
     try:
         # Get the fields from the body of the request, deserialize using marathon_schema
         body_data = marathon_schema.load(request.get_json())
+        # Fetch date and store in marathon_date variable
+        marathon_date_str = body_data.get("date")
+        # Convert str into date object, Format YYYY-MM-DD
+        marathon_date = datetime.strptime(marathon_date_str, '%Y-%m-%d').date()
+        
+        # Check date validation, return error msg if past date
+        if marathon_date <= date.today():
+            return {"error": "The marathon date must be in the future."}, 400
 
         # Create a new marathon instance
         marathon = Marathon(
             name=body_data.get("name"),
-            date=date.today(),
+            date=marathon_date,
             location=body_data.get("location"),
             distance_kms=body_data.get("distance_kms")
         )
@@ -49,33 +57,52 @@ def register_marathon():
         db.session.commit()
         # Return acknowledgment message
         return marathon_schema.dump(marathon), 201
-    # Return not null violation personalised message   
+    # Return not null violation and invalid format personalised msgs   
     except IntegrityError as err:
         if err.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
             return{"error": f"The column {err.orig.diag.column_name} is required"}, 400
+    except ValueError:
+        return {"error": "Invalid date format. Use YYYY-MM-DD."}, 400
 
 
 # Create route for updating marathon JWT required
 # @auth_as_admin to only authorise admins to perform this
-@marathon_bp.route("/<int:marathon_id>", methods = ["PUT", "PATCH"])
+from datetime import datetime, date
+from sqlalchemy.exc import IntegrityError
+
+@marathon_bp.route("/<int:marathon_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 @auth_as_admin_decorator
 def update_marathon(marathon_id):
-    # Get the fields from body of the request, partial=True to update partial data
+    # Get the fields from the body of the request, allowing for partial updates
     body_data = marathon_schema.load(request.get_json(), partial=True)
     stmt = db.select(Marathon).filter_by(id=marathon_id)
     marathon = db.session.scalar(stmt)
-    # If marathon exist, edit required fields, ELSE returns error message
+
+    # If marathon exists, edit required fields
     if marathon:
-        marathon.name = body_data.get("name") or marathon.name
-        marathon.date = body_data.get("date") or marathon.date
-        marathon.location = body_data.get("location") or marathon.location
-        marathon.distance_kms = body_data.get("distance_kms") or marathon.distance_kms
-        # Commit changes to DB, return updated marathon
+        marathon.name = body_data.get("name", marathon.name)
+        marathon.location = body_data.get("location", marathon.location)
+        marathon.distance_kms = body_data.get("distance_kms", marathon.distance_kms)
+
+        # Update and validate the date if provided, return error msg for invalid format
+        if "date" in body_data:
+            try:
+                # Use date format YYYY-MM-DD
+                marathon.date = datetime.strptime(body_data["date"], '%Y-%m-%d').date()
+                # return error msg if past date
+                if marathon.date <= date.today():
+                    return {"error": "The marathon date must be in the future."}, 400
+            except ValueError:
+                return {"error": "Invalid date format. Use YYYY-MM-DD."}, 400
+
+
+        # Commit changes to DB and return the updated marathon
         db.session.commit()
-        return marathon_schema.dump(marathon)
-    else:
-        return {"error": f"Marathon with id {marathon_id} has not been found."}, 404
+        return marathon_schema.dump(marathon), 200
+    
+    # Return an error if the marathon does not exist
+    return {"error": f"Marathon with id {marathon_id} has not been found."}, 404
 
 
 # Create route for deleting marathon, JWT required

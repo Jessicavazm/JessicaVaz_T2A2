@@ -90,13 +90,13 @@ def seed_tables():
     marathons = [
             Marathon(
                 name = "Marathon A",
-                date = date.today(), 
+                date = date(2026, 12, 12), 
                 location = "Gold Coast",
                 distance_kms = 10
             ), 
             Marathon(
                 name = "Marathon B",
-                date = date.today(),
+                date = date(2025, 10, 8),
                 location = "Melbourne",
                 distance_kms = 20
             )
