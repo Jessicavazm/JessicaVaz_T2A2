@@ -1,12 +1,12 @@
 from datetime import date, datetime
 
 from flask import Blueprint, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from flask_jwt_extended import jwt_required
+from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
 
 from init import db
-from models.marathon import Marathon, MarathonSchema, marathon_schema, marathons_schema
+from models.marathon import Marathon, marathon_schema, marathons_schema
 from models.user import User
 from utils import auth_as_admin_decorator
 
@@ -25,7 +25,19 @@ def get_all_marathons():
     # Else returns error message
     else:
         return {"Error": "No marathons to display."}, 400
-    
+
+
+# Create route for 'GET' a specific marathon
+@marathon_bp.route("/<int:marathon_id>")
+def get_a_marathon(marathon_id):
+    # Use stmt and filter_by to select a specific workout
+    stmt = db.select(Marathon).filter_by(id=marathon_id)
+    marathon = db.session.scalar(stmt)
+    # If marathon returns it, Else returns error msg
+    if marathon:
+        return marathon_schema.dump(marathon)
+    else:
+        return {"error": f"Marathon with {marathon_id} not found."}, 404
 
 # Create 'register' marathon route,'POST' method to insert data into DB
 # Auth_as_admin decorator only allows admin to create marathons
@@ -37,7 +49,7 @@ def register_marathon():
         # Get the fields from the body of the request, deserialize using marathon_schema
         body_data = marathon_schema.load(request.get_json())
         # Fetch date and store in marathon_date variable
-        marathon_date_str = body_data.get("date")
+        marathon_date_str = body_data.get("event_date")
         # Convert str into date object, Format YYYY-MM-DD
         marathon_date = datetime.strptime(marathon_date_str, '%Y-%m-%d').date()
         
@@ -48,7 +60,7 @@ def register_marathon():
         # Create a new marathon instance
         marathon = Marathon(
             name=body_data.get("name"),
-            date=marathon_date,
+            event_date=marathon_date,
             location=body_data.get("location"),
             distance_kms=body_data.get("distance_kms")
         )

@@ -24,26 +24,45 @@ def create_tables():
 # Command to seed the tables
 @db_commands.cli.command("seed")
 def seed_tables():
+    
+    # Add running groups to groups table
+    groups = [
+            Group(
+                name = "Group A",
+                date_created = date.today()
+            ), 
+            Group(
+                name = "Group B",
+                date_created = date.today()
+            )
+        ]
+    # Add created groups to DB
+    db.session.add_all(groups)
+    db.session.commit()
+
+
     # Add users to users table
     users = [
         User(
             name = "User A",
             email = "admin_a@email.com",
             password = bcrypt.generate_password_hash("123456").decode("utf-8"),
-            is_admin = True
+            is_admin = True,
+            group_id=groups[0].id
         ), 
         User(
             name = "User B",
             email = "user_b@email.com",
             password = bcrypt.generate_password_hash("123456").decode("utf-8"),
-            is_admin = True
+            is_admin = True,
+            group_id=groups[0].id,
         ),
         User(
             name = "User C",
             email = "user_c@email.com",
             password = bcrypt.generate_password_hash("123456").decode("utf-8"),
+            group_id=groups[1].id,
         )
-
     ]
     # Add created users to DB
     db.session.add_all(users)
@@ -70,33 +89,17 @@ def seed_tables():
     db.session.commit()
 
 
-    # Add running groups to groups table
-    groups = [
-            Group(
-                name = "Group A",
-                date_created = date.today()
-            ), 
-            Group(
-                name = "Group B",
-                date_created = date.today()
-            )
-        ]
-    # Add created groups to DB
-    db.session.add_all(groups)
-    db.session.commit()
-
-
     # Add marathon events to marathons tables
     marathons = [
             Marathon(
                 name = "Marathon A",
-                date = date(2026, 12, 12), 
+                event_date = date(2026, 12, 12), 
                 location = "Gold Coast",
                 distance_kms = 10
             ), 
             Marathon(
                 name = "Marathon B",
-                date = date(2025, 10, 8),
+                event_date = date(2025, 10, 8),
                 location = "Melbourne",
                 distance_kms = 20
             )
@@ -110,18 +113,19 @@ def seed_tables():
     logs = [
             Log(
                 entry_created = date.today(),
-                group_id=groups[1].id,  
+                group_id=groups[0].id ,  
                 marathon_id=marathons[1].id 
             ), 
             Log(
                 entry_created = date.today(),
-                group_id=groups[0].id,  
+                group_id=groups[1].id,  
                 marathon_id=marathons[0].id 
             )
         ]
     # Add created logs and commit changes to DB
     db.session.add_all(logs)
     db.session.commit()
+    
     print("Tables seeded!")
 
 

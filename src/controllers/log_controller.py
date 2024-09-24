@@ -1,13 +1,10 @@
-from datetime import date
-
-from flask import Blueprint, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from flask import Blueprint
+from flask_jwt_extended import jwt_required
+from sqlalchemy.exc import SQLAlchemyError
 from psycopg2 import errorcodes
 
 from init import db
-from models.log import Log, LogSchema, log_schema, logs_schema
-from models.user import User
+from models.log import Log, log_schema, logs_schema
 from utils import auth_as_admin_decorator
 
 # Create marathon blueprint

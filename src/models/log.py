@@ -23,8 +23,8 @@ class Log(db.Model):
 # Unpack complex data with fields.Nested method
 # Only include attribute 'name' from 'groups' table and 'name' and 'date' from marathons table
 class LogSchema(ma.Schema):
-    group = (fields.Nested("GroupSchema", only = ["name"]))
-    marathon = (fields.Nested("MarathonSchema", only = ["name", "date"]))
+    group = fields.Nested("GroupSchema", only = ["name"])
+    marathon = fields.Nested("MarathonSchema", exclude=["logs"])
     class Meta:
         fields = ["id", "entry_created", "group", "marathon"]
 

@@ -2,13 +2,13 @@ from datetime import date
 
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
 
 from init import db
-from models.group import Group, GroupSchema, group_schema, groups_schema
+from models.group import Group,group_schema, groups_schema
 from models.user import User
-from models.marathon import Marathon, marathon_schema, MarathonSchema, marathons_schema
+from models.marathon import Marathon
 from models.log import Log, log_schema
 
 from utils import auth_as_admin_decorator
@@ -30,6 +30,19 @@ def get_all_groups():
     else:
         return {"Error": "No groups to display."}, 400
 
+
+# Create route for 'GET' a specific group
+@group_bp.route("/<int:group_id>")
+def get_a_group(group_id):
+    # Use stmt and filter_by to select a specific group
+    stmt = db.select(Group).filter_by(id=group_id)
+    group = db.session.scalar(stmt)
+    # If marathon returns it, Else returns error msg
+    if group:
+        return group_schema.dump(group)
+    else:
+        return {"error": f"Group with {group_id} not found."}, 404
+    
 
 # Create 'register' group route,'POST' method to insert data into DB
 # Auth_as_admin decorator only allows admin to create a group

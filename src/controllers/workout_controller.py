@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
 
 from init import db
-from models.workout import Workout, workout_schema, workouts_schema, WorkoutSchema
+from models.workout import Workout, workout_schema, workouts_schema
 
 
 # Create workout blueprint

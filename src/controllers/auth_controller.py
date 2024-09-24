@@ -70,9 +70,9 @@ def login_user():
     # If user exist and password is correct
     if user and bcrypt.check_password_hash(user.password, body_data.get("password")):
         # Create token and return it to user
-        token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=2))
+        token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=1))
         return{"email": user.email, "token": token}
-    # else return error message
+    # else return error msg
     else:
         return {"error": "Invalid credentials"}, 400
 
@@ -89,16 +89,16 @@ def update_user(user_id):
     user = db.session.scalar(stmt)
     # If the user exist, update the required fields
     if user:
-        # 'OR' statement evaluates what comes true first
+        # 'OR' statement evaluates what comes true first and execute it
         user.name = body_data.get("name") or user.name
         user.email = body_data.get("email") or user.email
         if password:
             user.password = bcrypt.generate_password_hash(password).decode("utf-8")
         # Commit to the DB
         db.session.commit()
-        # Return an acknowledgement message
+        # Return an acknowledgement msg
         return user_schema.dump(user)
-    # Else return error message
+    # Else returns error msg
     else:
         return {"error": "User does not exist."}, 400
 
