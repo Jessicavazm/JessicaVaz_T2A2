@@ -15,13 +15,13 @@ class Marathon(db.Model):
     
     # Define bidirectional relationships with 'logs' table
     # Cascade to delete logs and group if marathon is deleted
-    logs = db.relationship("Log", back_populates="marathon", cascade="all, delete")
+    marathon_logs = db.relationship("MarathonLog", back_populates="marathon", cascade="all, delete")
 
 # Define 'marathon' schema and class 'Meta' fields to serialize/ deserialize data
 # Unpack complex data with fields.Nested method, fields.List to unpack a list of logs
 # Exclude marathon from log schema to avoid redundant data info
 class MarathonSchema(ma.Schema):
-    logs = fields.List(fields.Nested("LogSchema", exclude=["marathon"]))
+    marathon_logs = fields.List(fields.Nested("LogSchema", exclude=["marathon"]))
     class Meta:
         fields = ["id", "name", "event_date", "location", "distance_kms", "logs"]
         ordered = True

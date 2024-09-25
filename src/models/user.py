@@ -15,23 +15,20 @@ class User(db.Model):
     password = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     
-    # FK to reference the groups table
-    group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
     # Define bidirectional relationships with 'workouts' and 'groups' tables
     # Cascade to delete workouts and group if user is deleted
     workouts = db.relationship("Workout", back_populates = "user", cascade="all, delete")
-    group = db.relationship("Group", back_populates= "users", cascade="all, delete")
-
+    group_logs = db.relationship("GroupLog", back_populates="user", cascade="all, delete")
 
 # Define 'user' schema and class 'Meta' fields to serialize/ deserialize data
-# Unpack complex data with fields.Nested method, fields.List to unpack a list of workouts
-# Exclude 'user' from 'workouts' table, and only add 'name' from 'groups' table to avoid redundant data
+# Unpack complex data with fields.Nested method, fields.List to unpack a list of objects
+# Exclude 'user' from workouts and group_logs schemas to avoid redundant data
 class UserSchema(ma.Schema):
     workouts = fields.List(fields.Nested("WorkoutSchema", exclude=["user"]))
-    group = fields.Nested("GroupSchema", only=["id", "name"])
+    group_logs = fields.List(fields.Nested("GroupLogSchema", exclude=["user"]))
     class Meta:
-        fields = ["id", "name", "email", "password", "is_admin", "workouts", "group"]
+        fields = ["id", "name", "email", "password", "is_admin", "workouts", "group_logs"]
         ordered = True 
 
 

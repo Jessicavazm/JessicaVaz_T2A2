@@ -1,3 +1,4 @@
+from datetime import date
 from init import db, ma
 from marshmallow import fields
 
@@ -9,7 +10,7 @@ class Workout(db.Model):
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
-    date = db.Column(db.Date, nullable=False)
+    date =db.Column(db.Date, default=date.today)
     distance_kms = db.Column(db.Integer, nullable=False)
     calories_burnt = db.Column(db.Integer)
 
