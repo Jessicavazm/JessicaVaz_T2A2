@@ -51,41 +51,36 @@ def get_a_group(group_id):
 @jwt_required()
 @auth_as_admin_decorator
 def create_a_group():
-    try:
-        # Get the admin using JWT
-        admin_id = get_jwt_identity()
-        admin_user = User.query.get(admin_id)
+    # try:
+    # Get the admin using JWT
+    admin_id = get_jwt_identity()
+    admin_user = User.query.get(admin_id)
 
-        # Check if admin already has a group via junction table
-        existing_log = GroupLog.query.filter_by(user_id=admin_id).first()
-        if existing_log:
-            return {"error": "You have already created a group."}, 400
+    # Check if admin already has a group via junction table
+    existing_log = GroupLog.query.filter_by(user_id=admin_id).first()
+    if existing_log:
+        return {"error": "You have already created a group."}, 400
 
-        # Get the fields from the request and create a new group
-        body_data = group_schema.load(request.get_json())
-        group = Group(
-            name=body_data.get("name"),
-            date_created=date.today()
-        )
+    # Get the fields from the request and create a new group
+    # Load method for deserializing the schema validation
+    body_data = group_schema.load(request.get_json())
+    group = Group(
+        name=body_data.get("name"),
+        date_created=date.today()
+    )
 
-        # Add the new group to the database
-        db.session.add(group)
-        db.session.commit()
+    # Add the new group to the database
+    db.session.add(group)
+    db.session.commit()
 
-        # Log the changes in GroupLog
-        group_log = GroupLog(user_id=admin_user.id, group_id=group.id)
-        db.session.add(group_log)
-        db.session.commit()
+    # Log the changes in GroupLog
+    group_log = GroupLog(user_id=admin_user.id, group_id=group.id)
+    db.session.add(group_log)
+    db.session.commit()
 
-        # Return the created group
-        return group_schema.dump(group), 201
+    # Return the created group
+    return group_schema.dump(group), 201
 
-    # Except handles data violation and any other possible errors
-    except IntegrityError as err:
-        if err.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
-            return {"error": f"The column {err.orig.diag.column_name} is required"}, 400
-    except Exception as e:
-        return {"error": str(e)}, 500
 
 
 # Route for admins to update their group

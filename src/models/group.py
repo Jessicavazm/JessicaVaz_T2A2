@@ -1,6 +1,10 @@
 from datetime import date
-from init import db, ma
+
 from marshmallow import fields
+from marshmallow.validate import Length, And, Regexp, OneOf
+from marshmallow.exceptions import ValidationError
+
+from init import db, ma
 
 
 class Group(db.Model):
@@ -9,7 +13,7 @@ class Group(db.Model):
 
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(20), nullable=False)
     date_created = db.Column(db.Date, default=date.today)
 
     # Define bidirectional relationships with groups_logs and marathons_logs
@@ -24,6 +28,11 @@ class Group(db.Model):
 class GroupSchema(ma.Schema):
     group_logs = fields.List(fields.Nested("GroupLogSchema", exclude=["group"]))
     marathon_logs = fields.List(fields.Nested("MarathonLogSchema", exclude=["group"]))
+
+    # Validation for attribute 'name', 
+    # Name containing two names is allowed eg: 'Coder academy'
+    name = fields.String(required=True, validate=And(Length(min=4, max=20, error="Name must be between 4 and 20 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
+
     class Meta:
         fields = ["id", "name", "date_created", "logs", "group_logs", "marathon_logs"]
         ordered = True

@@ -4,6 +4,9 @@ import os
 # To create the API
 from flask import Flask
 
+# To handle Validation errors
+from marshmallow.exceptions import ValidationError
+
 # Import objects from init.py
 from init import db, ma, bcrypt, jwt
 
@@ -28,6 +31,13 @@ def  create_app():
     bcrypt.init_app(app)
     jwt.init_app(app)
     
+
+    # Decorator to handle validation errors, return error msg
+    @app.errorhandler(ValidationError)
+    def validation_error(err):
+        return {"error": err.messages}, 400
+
+
     # Register blueprints
     app.register_blueprint(db_commands)
     app.register_blueprint(auth_bp)
