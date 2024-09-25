@@ -14,7 +14,7 @@ from models.log import Log, log_schema
 from utils import auth_as_admin_decorator
 
 # Group blueprint
-group_bp = Blueprint("group", __name__,url_prefix="/group")
+group_bp = Blueprint("groups", __name__,url_prefix="/groups")
 
 
 # 
@@ -123,48 +123,48 @@ def delete_group(group_id):
         return {"error": f"Group {group_id} has been not found."}, 404
     
 
-# Create route for admins to enrol their group in marathons events, JWT required
-# POST method to insert data in DB
-@group_bp.route("/marathon_signup/<int:marathon_id>", methods=["POST"])
-@jwt_required()
-@auth_as_admin_decorator
-def signup_marathon(marathon_id):
-    try:
-        # Get the admin using JWT 
-        admin_id = get_jwt_identity()
-        admin_user = User.query.get(admin_id) 
+# # Create route for admins to enrol their group in marathons events, JWT required
+# # POST method to insert data in DB
+# @group_bp.route("/marathon_signup/<int:marathon_id>", methods=["POST"])
+# @jwt_required()
+# @auth_as_admin_decorator
+# def signup_marathon(marathon_id):
+#     try:
+#         # Get the admin using JWT 
+#         admin_id = get_jwt_identity()
+#         admin_user = User.query.get(admin_id) 
 
-        # Get the group associated with the admin
-        group = Group.query.get(admin_user.group_id)
-        if not group:
-            return {"error": "Group not found, try creating a group first."}, 404
+#         # Get the group associated with the admin
+#         group = Group.query.get(admin_user.group_id)
+#         if not group:
+#             return {"error": "Group not found, try creating a group first."}, 404
 
-        # Check if the marathon exists
-        marathon = Marathon.query.get(marathon_id)
-        if not marathon:
-            return {"error": "Marathon not found."}, 404
+#         # Check if the marathon exists
+#         marathon = Marathon.query.get(marathon_id)
+#         if not marathon:
+#             return {"error": "Marathon not found."}, 404
         
-        # Check if the group is already signed up for this marathon
-        existing_log = Log.query.filter_by(group_id=group.id, marathon_id=marathon_id).first()
-        if existing_log:
-            return {"error": "This group is already enrolled in this marathon."}, 400
+#         # Check if the group is already signed up for this marathon
+#         existing_log = Log.query.filter_by(group_id=group.id, marathon_id=marathon_id).first()
+#         if existing_log:
+#             return {"error": "This group is already enrolled in this marathon."}, 400
 
-        # Create the log entry
-        log_entry = Log(
-            entry_created=date.today(),
-            group_id=group.id,
-            marathon_id=marathon_id  
-        )
+#         # Create the log entry
+#         log_entry = Log(
+#             entry_created=date.today(),
+#             group_id=group.id,
+#             marathon_id=marathon_id  
+#         )
 
-        # Add the log entry to the database
-        db.session.add(log_entry)
-        db.session.commit()
+#         # Add the log entry to the database
+#         db.session.add(log_entry)
+#         db.session.commit()
 
-        # Return a success message
-        return log_schema.dump(log_entry), 201
+#         # Return a success message
+#         return log_schema.dump(log_entry), 201
 
-    except Exception as e:
-        return {"error": str(e)}, 500
+#     except Exception as e:
+#         return {"error": str(e)}, 500
 
 
 # Create route for users to enrol in a group, JWT required

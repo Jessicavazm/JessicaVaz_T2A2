@@ -10,7 +10,7 @@ from models.workout import Workout, workout_schema, workouts_schema
 
 
 # Create workout blueprint
-workout_bp = Blueprint("workout", __name__,url_prefix="/workout")
+workout_bp = Blueprint("workouts", __name__,url_prefix="/workouts")
 
 
 # Route for users to see all their workout sessions, JWT required

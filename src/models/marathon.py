@@ -8,7 +8,7 @@ class Marathon(db.Model):
 
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False, unique=True)
+    name = db.Column(db.String(50), nullable=False)
     event_date = db.Column(db.Date, nullable=False)
     location = db.Column(db.String(100), nullable=False)
     distance_kms = db.Column(db.Integer, nullable=False)
