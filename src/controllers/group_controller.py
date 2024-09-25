@@ -13,10 +13,11 @@ from models.log import Log, log_schema
 
 from utils import auth_as_admin_decorator
 
-# Create workout blueprint
+# Group blueprint
 group_bp = Blueprint("group", __name__,url_prefix="/group")
 
 
+# 
 @group_bp.route("/")
 def get_all_groups():
     # Create and execute stmt, order by asc order

@@ -10,27 +10,28 @@ from models.marathon import Marathon, marathon_schema, marathons_schema
 from models.user import User
 from utils import auth_as_admin_decorator
 
-# Create marathon blueprint
+# Marathon blueprint
 marathon_bp = Blueprint("marathon", __name__,url_prefix="/marathon")
 
+
+# Route for users to see all marathons 
 @marathon_bp.route("/")
 def get_all_marathons():
-    # Create and execute stmt, order by asc order
-    # Convert marathon to list to use IF statement 
+    # Fetch marathons from DB
     stmt = db.select(Marathon).order_by(Marathon.name.asc())
     marathons = list(db.session.scalars(stmt))
     if marathons:
         # Serialise data using marathons_schema
         return marathons_schema.dump(marathons), 200
-    # Else returns error message
+    # Else returns error msg
     else:
         return {"Error": "No marathons to display."}, 400
 
 
-# Create route for 'GET' a specific marathon
+# Route for users to see a specific marathon
 @marathon_bp.route("/<int:marathon_id>")
 def get_a_marathon(marathon_id):
-    # Use stmt and filter_by to select a specific workout
+    # filter_by to select a specific workout
     stmt = db.select(Marathon).filter_by(id=marathon_id)
     marathon = db.session.scalar(stmt)
     # If marathon returns it, Else returns error msg
@@ -39,8 +40,8 @@ def get_a_marathon(marathon_id):
     else:
         return {"error": f"Marathon with {marathon_id} not found."}, 404
 
-# Create 'register' marathon route,'POST' method to insert data into DB
-# Auth_as_admin decorator only allows admin to create marathons
+
+# Route for admins to create marathons
 @marathon_bp.route("/register", methods=["POST"])
 @jwt_required()
 @auth_as_admin_decorator
@@ -69,16 +70,18 @@ def register_marathon():
         db.session.commit()
         # Return acknowledgment message
         return marathon_schema.dump(marathon), 201
-    # Return not null violation and invalid format personalised msgs   
+    
+    # Return personalised msgs for data violations and invalid data
     except IntegrityError as err:
         if err.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
             return{"error": f"The column {err.orig.diag.column_name} is required"}, 400
+        if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
+            return {"error": "Email address must be unique"}, 400
     except ValueError:
         return {"error": "Invalid date format. Use YYYY-MM-DD."}, 400
 
 
-# Create route for updating marathon, JWT required
-# @auth_as_admin to only authorise admins to perform this
+# Route for admin to update marathon info
 @marathon_bp.route("/<int:marathon_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 @auth_as_admin_decorator
@@ -114,8 +117,7 @@ def update_marathon(marathon_id):
     return {"error": f"Marathon with id {marathon_id} has not been found."}, 404
 
 
-# Create route for deleting marathon, JWT required
-# @auth_as_admin to only authorise admins to perform this
+# Route for admin to delete marathon event
 @marathon_bp.route("/<int:marathon_id>", methods=["DELETE"])
 @jwt_required()
 @auth_as_admin_decorator

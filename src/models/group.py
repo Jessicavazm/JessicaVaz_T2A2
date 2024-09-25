@@ -8,7 +8,7 @@ class Group(db.Model):
 
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False, unique=True)
     date_created = db.Column(db.Date)
 
     # Define bidirectional relationships with 'users' and 'logs' tables

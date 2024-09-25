@@ -13,8 +13,9 @@ from models.workout import Workout, workout_schema, workouts_schema
 workout_bp = Blueprint("workout", __name__,url_prefix="/workout")
 
 
-# Create route for 'GET' workouts
+# Route for users to see all their workout sessions, JWT required
 @workout_bp.route("/")
+@jwt_required()
 def get_all_workouts():
     # Create and execute stmt, order by descending order
     # Convert workouts to list to use IF statement 
@@ -28,8 +29,9 @@ def get_all_workouts():
         return {"Error": "No workouts to display."}, 400
 
 
-# Create route for 'GET' a specific workout
+# Route for users to see a specific workout session, JWT required
 @workout_bp.route("/<int:workout_id>")
+@jwt_required()
 def get_a_workout(workout_id):
     # Use stmt and filter_by to select a specific workout
     stmt = db.select(Workout).filter_by(id=workout_id)
@@ -41,7 +43,7 @@ def get_a_workout(workout_id):
         return {"error": f"Card with {workout_id} not found."}, 404
 
 
-# Create 'register' workout route, JWT required, 'POST' method to insert data into DB
+# Route for users to create log their workout session
 @workout_bp.route("/", methods=["POST"])
 @jwt_required()
 def register_workout():
@@ -68,7 +70,7 @@ def register_workout():
             return{"error": f"The column {err.orig.diag.column_name} is required"}, 400
 
 
-# Create route for updating workout, JWT required
+# Route for users to update their workout session, JWT required
 @workout_bp.route("/<int:workout_id>", methods = ["PUT", "PATCH"])
 @jwt_required()
 def update_workout(workout_id):
@@ -86,9 +88,10 @@ def update_workout(workout_id):
         return workout_schema.dump(workout)
     else:
         return {"error": f"Workout with id {workout_id} has not been found."}, 404
+    
 
 
-# Create route for deleting workout, JWT required
+# Route for users to delete their workout session, JWT required
 @workout_bp.route("/<int:workout_id>", methods=["DELETE"])
 @jwt_required()
 def delete_card(workout_id):
