@@ -1,5 +1,5 @@
 from marshmallow import fields
-from marshmallow.validate import Length, And, Regexp, OneOf
+from marshmallow.validate import Length, And, Regexp, Range
 
 from init import db, ma
 
@@ -12,7 +12,7 @@ class Marathon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False)
     event_date = db.Column(db.Date, nullable=False)
-    location = db.Column(db.String(100), nullable=False)
+    location = db.Column(db.String, nullable=False)
     distance_kms = db.Column(db.Integer, nullable=False)
     
     # Define bidirectional relationships with 'logs' table
@@ -28,6 +28,7 @@ class MarathonSchema(ma.Schema):
     # Validation for attribute 'name', 
     # Name containing two names is allowed eg: 'Coder academy'
     name = fields.String(required=True, validate=And(Length(min=4, max=20, error="Name must be between 4 and 20 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
+    
     
     class Meta:
         fields = ["id", "name", "event_date", "location", "distance_kms", "marathon_logs"]

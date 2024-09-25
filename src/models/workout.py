@@ -1,7 +1,13 @@
 from datetime import date
-from init import db, ma
-from marshmallow import fields
 
+from marshmallow import fields
+from marshmallow.validate import OneOf
+
+from init import db, ma
+
+
+# Specific entries allowed for workout title attribute
+VALID_STATUSES = ("Treadmill", "Outside run", "Outside Walk", "Marathon run")
 
 class Workout(db.Model):
     # Name of the table
@@ -26,6 +32,10 @@ class Workout(db.Model):
 # Only include attribute 'name' from 'users' table to avoid redundant data
 class WorkoutSchema(ma.Schema):
     user = fields.Nested("UserSchema", only=["id", "name"])
+
+    # Title validation using a constant
+    title = fields.String(required=True, validate=OneOf(VALID_STATUSES))
+    
     class Meta:
         fields = ["id", "title", "date", "distance_kms", "calories_burnt", "user"]
         ordered = True

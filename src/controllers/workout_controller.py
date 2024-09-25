@@ -2,7 +2,7 @@ from datetime import date
 
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, DataError
 from psycopg2 import errorcodes
 
 from init import db
@@ -68,27 +68,36 @@ def register_workout():
     except IntegrityError as err:
         if err.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
             return{"error": f"The column {err.orig.diag.column_name} is required"}, 400
+    except DataError:
+        return {"error": "Invalid input for integer value, only numbers allowed."}, 400 
 
 
 # Route for users to update their workout session, JWT required
 @workout_bp.route("/<int:workout_id>", methods = ["PUT", "PATCH"])
 @jwt_required()
 def update_workout(workout_id):
-    # Get the fields from body of the request, partial=True to update partial data
-    body_data = workout_schema.load(request.get_json(), partial=True)
-    stmt = db.select(Workout).filter_by(id=workout_id)
-    workout = db.session.scalar(stmt)
-    # If workout exist, edit required fields, ELSE returns error message
-    if workout:
-        workout.title = body_data.get("title") or workout.title
-        workout.distance_kms = body_data.get("distance_kms") or workout.distance_kms
-        workout.calories_burnt = body_data.get("calories_burnt") or workout.calories_burnt
-        # Commit changes to DB, return updated workout
-        db.session.commit()
-        return workout_schema.dump(workout)
-    else:
-        return {"error": f"Workout with id {workout_id} has not been found."}, 404
-    
+    try: 
+        # Get the fields from body of the request, partial=True to update partial data
+        body_data = workout_schema.load(request.get_json(), partial=True)
+        stmt = db.select(Workout).filter_by(id=workout_id)
+        workout = db.session.scalar(stmt)
+        # If workout exist, edit required fields, ELSE returns error message
+        if workout:
+            workout.title = body_data.get("title") or workout.title
+            workout.distance_kms = body_data.get("distance_kms") or workout.distance_kms
+            workout.calories_burnt = body_data.get("calories_burnt") or workout.calories_burnt
+            # Commit changes to DB, return updated workout
+            db.session.commit()
+            return workout_schema.dump(workout)
+        else:
+            return {"error": f"Workout with id {workout_id} has not been found."}, 404
+    # Return not null violation personalised message   
+    except IntegrityError as err:
+        if err.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
+            return{"error": f"The column {err.orig.diag.column_name} is required"}, 400
+    except DataError:
+        return {"error": "Invalid input for integer value, only numbers allowed."}, 400 
+
 
 # Route for users to delete their workout session, JWT required
 @workout_bp.route("/<int:workout_id>", methods=["DELETE"])
