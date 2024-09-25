@@ -9,7 +9,7 @@ from init import db
 from models.group import Group,group_schema, groups_schema
 from models.user import User
 from models.marathon import Marathon
-from models.log import Log, log_schema
+from models.marathon_log import Log, log_schema
 
 from utils import auth_as_admin_decorator
 
@@ -17,7 +17,7 @@ from utils import auth_as_admin_decorator
 group_bp = Blueprint("groups", __name__,url_prefix="/groups")
 
 
-# 
+# Route to see all groups
 @group_bp.route("/")
 def get_all_groups():
     # Create and execute stmt, order by asc order
@@ -32,7 +32,7 @@ def get_all_groups():
         return {"Error": "No groups to display."}, 400
 
 
-# Create route for 'GET' a specific group
+# Route to see specific group
 @group_bp.route("/<int:group_id>")
 def get_a_group(group_id):
     # Use stmt and filter_by to select a specific group
@@ -45,12 +45,11 @@ def get_a_group(group_id):
         return {"error": f"Group with {group_id} not found."}, 404
     
 
-# Create 'register' group route,'POST' method to insert data into DB
-# Auth_as_admin decorator only allows admin to create a group
-@group_bp.route("/register", methods=["POST"])
+# Route for admin to create a group
+@group_bp.route("/", methods=["POST"])
 @jwt_required()
 @auth_as_admin_decorator
-def register_group():
+def create_a_group():
     try:
         # Get the admin using JWT 
         admin_id = get_jwt_identity()
@@ -85,8 +84,7 @@ def register_group():
         return {"error": str(e)}, 500
     
 
-# Create route for updating group info, "PATCH" to insert data into DB
-# @auth_as_admin decorator to ensure only admin can perform this action
+# Route for admins to update their group info
 @group_bp.route("/<int:group_id>", methods = ["PUT", "PATCH"])
 @jwt_required()
 @auth_as_admin_decorator
@@ -105,8 +103,7 @@ def update_group(group_id):
             return {"error": f"Group with id {group_id} has not been found."}, 404
 
 
-# Create route for deleting group, JWT required
-# @auth_as_admin decorator to ensure only admin can perform this action
+# Route for admins to delete their group
 @group_bp.route("/<int:group_id>", methods=["DELETE"])
 @jwt_required()
 @auth_as_admin_decorator
@@ -122,49 +119,6 @@ def delete_group(group_id):
     else:
         return {"error": f"Group {group_id} has been not found."}, 404
     
-
-# # Create route for admins to enrol their group in marathons events, JWT required
-# # POST method to insert data in DB
-# @group_bp.route("/marathon_signup/<int:marathon_id>", methods=["POST"])
-# @jwt_required()
-# @auth_as_admin_decorator
-# def signup_marathon(marathon_id):
-#     try:
-#         # Get the admin using JWT 
-#         admin_id = get_jwt_identity()
-#         admin_user = User.query.get(admin_id) 
-
-#         # Get the group associated with the admin
-#         group = Group.query.get(admin_user.group_id)
-#         if not group:
-#             return {"error": "Group not found, try creating a group first."}, 404
-
-#         # Check if the marathon exists
-#         marathon = Marathon.query.get(marathon_id)
-#         if not marathon:
-#             return {"error": "Marathon not found."}, 404
-        
-#         # Check if the group is already signed up for this marathon
-#         existing_log = Log.query.filter_by(group_id=group.id, marathon_id=marathon_id).first()
-#         if existing_log:
-#             return {"error": "This group is already enrolled in this marathon."}, 400
-
-#         # Create the log entry
-#         log_entry = Log(
-#             entry_created=date.today(),
-#             group_id=group.id,
-#             marathon_id=marathon_id  
-#         )
-
-#         # Add the log entry to the database
-#         db.session.add(log_entry)
-#         db.session.commit()
-
-#         # Return a success message
-#         return log_schema.dump(log_entry), 201
-
-#     except Exception as e:
-#         return {"error": str(e)}, 500
 
 
 # Create route for users to enrol in a group, JWT required

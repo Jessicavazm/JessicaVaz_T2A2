@@ -13,7 +13,7 @@ from controllers.auth_controller import auth_bp
 from controllers.workout_controller import workout_bp
 from controllers.group_controller import group_bp
 from controllers.marathon_controller import marathon_bp
-from controllers.log_controller import log_bp
+from controllers.marathon_log_controller import log_bp
 
 
 # Define the app inside of an application factory function

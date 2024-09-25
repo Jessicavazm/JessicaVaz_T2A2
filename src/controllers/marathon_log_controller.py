@@ -6,7 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from psycopg2 import errorcodes
 
 from init import db
-from models.log import Log, log_schema, logs_schema
+from models.marathon_log import Log, log_schema, logs_schema
 from utils import auth_as_admin_decorator
 from models.user import User
 from models.group import Group

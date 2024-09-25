@@ -7,7 +7,7 @@ from models.user import User
 from models.workout import Workout
 from models.group import Group
 from models.marathon import Marathon
-from models.log import Log
+from models.marathon_log import Log
 
 
 # Create db_commands blueprint

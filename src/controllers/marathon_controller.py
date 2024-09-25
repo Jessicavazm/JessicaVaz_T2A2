@@ -9,7 +9,7 @@ from init import db
 from models.marathon import Marathon, marathon_schema, marathons_schema
 from models.user import User
 from utils import auth_as_admin_decorator
-from controllers.log_controller import log_bp
+from controllers.marathon_log_controller import log_bp
 
 
 # Create Marathon bp
