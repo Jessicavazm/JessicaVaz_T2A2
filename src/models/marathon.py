@@ -21,9 +21,9 @@ class Marathon(db.Model):
 # Unpack complex data with fields.Nested method, fields.List to unpack a list of logs
 # Exclude marathon from log schema to avoid redundant data info
 class MarathonSchema(ma.Schema):
-    marathon_logs = fields.List(fields.Nested("LogSchema", exclude=["marathon"]))
+    marathon_logs = fields.List(fields.Nested("MarathonLogSchema", only=["id", "entry_created"]))
     class Meta:
-        fields = ["id", "name", "event_date", "location", "distance_kms", "logs"]
+        fields = ["id", "name", "event_date", "location", "distance_kms", "marathon_logs"]
         ordered = True
 
 

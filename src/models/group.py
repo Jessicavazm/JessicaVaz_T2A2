@@ -23,9 +23,9 @@ class Group(db.Model):
 # Exclude 'group' from log and group schemas to avoid redundant data
 class GroupSchema(ma.Schema):
     group_logs = fields.List(fields.Nested("GroupLogSchema", exclude=["group"]))
-    marathon_logs = fields.List(fields.Nested("LogSchema", exclude=["group"]))
+    marathon_logs = fields.List(fields.Nested("MarathonLogSchema", exclude=["group"]))
     class Meta:
-        fields = ["id", "name", "date_created", "logs", "group_logs"]
+        fields = ["id", "name", "date_created", "logs", "group_logs", "marathon_logs"]
         ordered = True
 
 

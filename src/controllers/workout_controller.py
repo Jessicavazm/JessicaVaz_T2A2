@@ -90,7 +90,6 @@ def update_workout(workout_id):
         return {"error": f"Workout with id {workout_id} has not been found."}, 404
     
 
-
 # Route for users to delete their workout session, JWT required
 @workout_bp.route("/<int:workout_id>", methods=["DELETE"])
 @jwt_required()

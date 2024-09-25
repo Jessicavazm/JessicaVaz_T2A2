@@ -2,12 +2,13 @@ from datetime import timedelta
 
 from flask import Blueprint, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
+
+from init import db, bcrypt
 
 from models.user import User, UserSchema, user_schema
 from models.group import Group
-from init import db, bcrypt
 from utils import auth_as_admin_decorator
 
 
@@ -104,5 +105,3 @@ def delete_user(user_id):
     # Else returns error message
     else:
         return {"message": f"User with id {user_id} has not been found."}
-
-

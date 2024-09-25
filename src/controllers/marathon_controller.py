@@ -5,17 +5,16 @@ from flask_jwt_extended import jwt_required
 from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
 
+
 from init import db
 from models.marathon import Marathon, marathon_schema, marathons_schema
-from models.marathon_log import MarathonLog 
 from models.user import User
 from utils import auth_as_admin_decorator
 from controllers.marathon_log_controller import marathon_signup_bp
 
-
 # Create Marathon bp
 marathon_bp = Blueprint("marathons", __name__,url_prefix="/marathons")
-# Register log bp
+# Register marathon_signup bp
 marathon_bp.register_blueprint(marathon_signup_bp)
 
 
@@ -132,7 +131,7 @@ def delete_marathon(marathon_id):
     if marathon:    
         db.session.delete(marathon)
         db.session.commit()
-        return {"message": f"{marathon.name} has been deleted successfully!"}, 200
+        return {"message": f"{marathon.name} event has been deleted successfully!"}, 200
     else:
         return {"error": f"Marathon with ID {marathon_id} has been not found."}, 404
     

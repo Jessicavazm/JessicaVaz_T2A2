@@ -1,6 +1,9 @@
 from datetime import date
+
 from flask import Blueprint
+
 from init import db, bcrypt
+
 from models.user import User
 from models.workout import Workout
 from models.group import Group
@@ -29,12 +32,6 @@ def seed_tables():
             password=bcrypt.generate_password_hash("123456").decode("utf-8"),
             is_admin=True
         ), 
-        User(
-            name="User B",
-            email="user_b@email.com",
-            password=bcrypt.generate_password_hash("123456").decode("utf-8"),
-            is_admin=True
-        ),
         User(
             name="User C",
             email="user_c@email.com",
