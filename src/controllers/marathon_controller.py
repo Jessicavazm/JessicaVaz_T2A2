@@ -7,15 +7,16 @@ from psycopg2 import errorcodes
 
 from init import db
 from models.marathon import Marathon, marathon_schema, marathons_schema
+from models.marathon_log import MarathonLog 
 from models.user import User
 from utils import auth_as_admin_decorator
-from controllers.marathon_log_controller import log_bp
+from controllers.marathon_log_controller import marathon_signup_bp
 
 
 # Create Marathon bp
 marathon_bp = Blueprint("marathons", __name__,url_prefix="/marathons")
 # Register log bp
-marathon_bp.register_blueprint(log_bp)
+marathon_bp.register_blueprint(marathon_signup_bp)
 
 
 # Route for users to see all marathons 
