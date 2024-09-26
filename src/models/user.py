@@ -46,5 +46,6 @@ class UserSchema(ma.Schema):
 
 
 # Create schema objects to handle one or multiple items
+# Exclude password field for handling sensitive data
 user_schema = UserSchema(exclude=["password"])
 users_schema = UserSchema(many=True, exclude=["password"])

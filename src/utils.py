@@ -20,21 +20,21 @@ def auth_as_admin_decorator(fn):
         # fetch user from DB using stmt
         stmt = db.select(User).filter_by(id=user_id)
         user = db.session.scalar(stmt)
+        
         # IF user is admin execute the function that called this decorator
-        if user.is_admin:
+        if user and user.is_admin:
             return fn(*args, **kwargs)
         # Else return error message
         else:
             return {"error": "Only admin can perform this action"}, 403
-    
     return wrapper
+
 
 def admin_group_check_decorator(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         # Get user id with get_jwt_identity
         user_id = get_jwt_identity()  
-
         # Check if the user is an admin
         stmt = db.select(User).filter_by(id=user_id)
         user = db.session.scalar(stmt)

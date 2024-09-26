@@ -15,16 +15,19 @@ from utils import auth_as_admin_decorator, admin_group_check_decorator
 
 # Group BP
 group_bp = Blueprint("groups", __name__, url_prefix="/groups")
+
 # Register group_sign_bp
 group_bp.register_blueprint(group_signup_bp)
 
 
+# GET method => /groups
 # Route to see all groups
 @group_bp.route("/")
 def get_all_groups():
     # Create and execute stmt, order by asc order
     stmt = db.select(Group).order_by(Group.name.asc())
     groups = list(db.session.scalars(stmt))
+    
     if groups:
         # Serialize data using groups_schema
         return groups_schema.dump(groups), 200
@@ -33,12 +36,14 @@ def get_all_groups():
         return {"Error": "No groups to display."}, 400
 
 
+# GET method => /groups/<group_id>
 # Route to see specific group
 @group_bp.route("/<int:group_id>")
 def get_a_group(group_id):
     # Use stmt and filter_by to select a specific group
     stmt = db.select(Group).filter_by(id=group_id)
     group = db.session.scalar(stmt)
+    
     # If group exists, return it, else return error msg
     if group:
         return group_schema.dump(group), 200
@@ -46,7 +51,9 @@ def get_a_group(group_id):
         return {"error": f"Group with {group_id} not found."}, 404
 
 
-# Route to create a group
+# POST method => /groups
+# Route for admin to create a group 
+# @admin_group_check decorator ensure admin hasn't created a group yet
 @group_bp.route("/", methods=["POST"])
 @jwt_required()
 @auth_as_admin_decorator
@@ -64,7 +71,7 @@ def create_a_group():
         db.session.add(group)
         db.session.commit()
 
-        # Log the changes in GroupLog
+        # Log the changes in GroupLog table
         group_log = GroupLog(user_id=get_jwt_identity(), group_id=group.id)
         db.session.add(group_log)
         db.session.commit()
@@ -75,11 +82,13 @@ def create_a_group():
         return {"error": f"An unexpected error has ocurred, {e}."}
     
 
+# PUT, PATCH methods => /groups/<group_id>
 # Route for admins to update their group
 @group_bp.route("/<int:group_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 @auth_as_admin_decorator
 def update_group(group_id):
+    
     # Get the fields from the body of the request, partial=True to update partial data
     body_data = group_schema.load(request.get_json(), partial=True)
     stmt = db.select(Group).filter_by(id=group_id)
@@ -95,11 +104,13 @@ def update_group(group_id):
         return {"error": f"Group with id {group_id} has not been found."}, 404
 
 
+# DELETE method => /groups/<group_id>
 # Route for admin to delete their group
 @group_bp.route("/<int:group_id>", methods=["DELETE"])
 @jwt_required()
 @auth_as_admin_decorator
 def delete_group(group_id):
+    
     # Fetch the group from the DB with stmt
     stmt = db.select(Group).filter_by(id=group_id)
     group = db.session.scalar(stmt)

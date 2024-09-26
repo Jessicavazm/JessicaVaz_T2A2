@@ -5,7 +5,6 @@ from flask_jwt_extended import jwt_required
 from sqlalchemy.exc import IntegrityError, DataError
 from psycopg2 import errorcodes
 
-
 from init import db
 from models.marathon import Marathon, marathon_schema, marathons_schema
 from models.user import User
@@ -24,6 +23,7 @@ def get_all_marathons():
     # Fetch marathons from DB
     stmt = db.select(Marathon).order_by(Marathon.name.asc())
     marathons = list(db.session.scalars(stmt))
+    
     if marathons:
         # Serialise data using marathons_schema
         return marathons_schema.dump(marathons), 200
@@ -38,6 +38,7 @@ def get_a_marathon(marathon_id):
     # filter_by to select a specific workout
     stmt = db.select(Marathon).filter_by(id=marathon_id)
     marathon = db.session.scalar(stmt)
+    
     # If marathon returns it, Else returns error msg
     if marathon:
         return marathon_schema.dump(marathon)
@@ -69,6 +70,7 @@ def register_marathon():
             location=body_data.get("location"),
             distance_kms=body_data.get("distance_kms")
         )
+       
         # Add and commit to the DB
         db.session.add(marathon)
         db.session.commit()
@@ -90,6 +92,8 @@ def register_marathon():
 @jwt_required()
 @auth_as_admin_decorator
 def update_marathon(marathon_id):
+    
+    # Fetch fields from body of request
     body_data = marathon_schema.load(request.get_json(), partial=True)
     stmt = db.select(Marathon).filter_by(id=marathon_id)
     marathon = db.session.scalar(stmt)
@@ -128,9 +132,11 @@ def update_marathon(marathon_id):
 @jwt_required()
 @auth_as_admin_decorator
 def delete_marathon(marathon_id):
+    
     # Fetch the marathon from DB with stmt
     stmt = db.select(Marathon).filter_by(id=marathon_id)
     marathon = db.session.scalar(stmt)
+    
     # If marathon exist delete it, ELSE returns error message
     if marathon:    
         db.session.delete(marathon)

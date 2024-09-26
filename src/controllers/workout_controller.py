@@ -7,6 +7,7 @@ from psycopg2 import errorcodes
 
 from init import db
 from models.workout import Workout, workout_schema, workouts_schema
+from models.user import User
 
 
 # Create workout blueprint
@@ -17,16 +18,19 @@ workout_bp = Blueprint("workouts", __name__,url_prefix="/workouts")
 @workout_bp.route("/")
 @jwt_required()
 def get_all_workouts():
-    # Create and execute stmt, order by descending order
-    # Convert workouts to list to use IF statement 
-    stmt = db.select(Workout).order_by(Workout.date.desc())
+    # Get the current user's identity from the JWT token
+    current_user = get_jwt_identity()
+
+    # Create and execute statement, filter by user's ID, order by desc date
+    stmt = db.select(Workout).filter_by(user_id=current_user).order_by(Workout.date.desc())
     workouts = list(db.session.scalars(stmt))
+    
     if workouts:
-        # Serialise data using workouts_schema
+        # Serialize data using workouts_schema
         return workouts_schema.dump(workouts), 200
-    # Else returns error message
     else:
-        return {"Error": "No workouts to display."}, 400
+        # Else return error msg
+        return {"Error": "No workouts to display for this user."}, 400
 
 
 # Route for users to see a specific workout session, JWT required
@@ -36,11 +40,12 @@ def get_a_workout(workout_id):
     # Use stmt and filter_by to select a specific workout
     stmt = db.select(Workout).filter_by(id=workout_id)
     workout = db.session.scalar(stmt)
+    
     # If workout returns workout, Else returns error message
     if workout:
         return workout_schema.dump(workout)
     else:
-        return {"error": f"Card with {workout_id} not found."}, 404
+        return {"error": f"Workout with {workout_id} not found."}, 404
 
 
 # Route for users to create log their workout session
@@ -59,6 +64,7 @@ def register_workout():
             calories_burnt=body_data.get("calories_burnt"),
             user_id=get_jwt_identity()
         )
+        
         # Add and commit to the DB
         db.session.add(workout)
         db.session.commit()
@@ -70,6 +76,8 @@ def register_workout():
             return{"error": f"The column {err.orig.diag.column_name} is required"}, 400
     except DataError:
         return {"error": "Invalid input for integer value, only numbers allowed."}, 400 
+    except Exception as e:
+        return {"error": f"An unexpected error had occurred, {e}"}
 
 
 # Route for users to update their workout session, JWT required
@@ -81,6 +89,7 @@ def update_workout(workout_id):
         body_data = workout_schema.load(request.get_json(), partial=True)
         stmt = db.select(Workout).filter_by(id=workout_id)
         workout = db.session.scalar(stmt)
+        
         # If workout exist, edit required fields, ELSE returns error message
         if workout:
             workout.title = body_data.get("title") or workout.title
@@ -106,6 +115,7 @@ def delete_card(workout_id):
     # Fetch the workout from DB with stmt
     stmt = db.select(Workout).filter_by(id=workout_id)
     workout = db.session.scalar(stmt)
+    
     # If workout exist delete it, ELSE returns error message
     if workout:    
         db.session.delete(workout)

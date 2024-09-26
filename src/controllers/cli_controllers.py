@@ -11,8 +11,10 @@ from models.marathon import Marathon
 from models.marathon_log import MarathonLog
 from models.group_log import GroupLog 
 
+
 # Create db_commands blueprint
 db_commands = Blueprint("db", __name__)
+
 
 # Command to create tables
 @db_commands.cli.command("create")
@@ -23,19 +25,18 @@ def create_tables():
 # Command to seed the tables
 @db_commands.cli.command("seed")
 def seed_tables():
-
     # Add users to users table
     users = [
         User(
             name="User A",
             email="admin_a@email.com",
-            password=bcrypt.generate_password_hash("123456").decode("utf-8"),
+            password=bcrypt.generate_password_hash("Brazil1.").decode("utf-8"),
             is_admin=True
         ), 
         User(
             name="User C",
             email="user_c@email.com",
-            password=bcrypt.generate_password_hash("123456").decode("utf-8")
+            password=bcrypt.generate_password_hash("Brazil2.").decode("utf-8")
         )
     ]
     # Add created users to DB
@@ -44,14 +45,14 @@ def seed_tables():
     # Add workouts to workouts table
     workouts = [
         Workout(
-            title="Running with friend",
+            title="Outside run",
             date=date.today(),
             distance_kms=10,
             calories_burnt=235,
             user=users[0]
         ), 
         Workout(
-            title="Running alone",
+            title="Outside run",
             date=date.today(),
             distance_kms=10,
             calories_burnt=250,
@@ -60,7 +61,6 @@ def seed_tables():
     ]
     # Add created workouts to DB
     db.session.add_all(workouts)
-
 
     # Add running groups to groups table
     groups = [
@@ -76,7 +76,6 @@ def seed_tables():
     # Add created groups to DB
     db.session.add_all(groups)
     db.session.commit()
-
 
     # Add marathon events to marathons table
     marathons = [
