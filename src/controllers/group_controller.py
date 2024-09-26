@@ -9,8 +9,8 @@ from init import db
 from models.group import Group, group_schema, groups_schema
 from models.user import User
 from models.group_log import GroupLog
-from utils import auth_as_admin_decorator
 from controllers.group_log_controller import group_signup_bp
+from utils import auth_as_admin_decorator, admin_group_check_decorator
 
 
 # Group BP
@@ -50,38 +50,30 @@ def get_a_group(group_id):
 @group_bp.route("/", methods=["POST"])
 @jwt_required()
 @auth_as_admin_decorator
+@admin_group_check_decorator
 def create_a_group():
-    # try:
-    # Get the admin using JWT
-    admin_id = get_jwt_identity()
-    admin_user = User.query.get(admin_id)
+    try:
+        # Get the fields from the request and create a new group
+        body_data = group_schema.load(request.get_json())
+        group = Group(
+            name=body_data.get("name"),
+            date_created=date.today()
+        )
 
-    # Check if admin already has a group via junction table
-    existing_log = GroupLog.query.filter_by(user_id=admin_id).first()
-    if existing_log:
-        return {"error": "You have already created a group."}, 400
+        # Add the new group to the database
+        db.session.add(group)
+        db.session.commit()
 
-    # Get the fields from the request and create a new group
-    # Load method for deserializing the schema validation
-    body_data = group_schema.load(request.get_json())
-    group = Group(
-        name=body_data.get("name"),
-        date_created=date.today()
-    )
+        # Log the changes in GroupLog
+        group_log = GroupLog(user_id=get_jwt_identity(), group_id=group.id)
+        db.session.add(group_log)
+        db.session.commit()
 
-    # Add the new group to the database
-    db.session.add(group)
-    db.session.commit()
-
-    # Log the changes in GroupLog
-    group_log = GroupLog(user_id=admin_user.id, group_id=group.id)
-    db.session.add(group_log)
-    db.session.commit()
-
-    # Return the created group
-    return group_schema.dump(group), 201
-
-
+        # Return the created group
+        return group_schema.dump(group), 201
+    except Exception as e:
+        return {"error": f"An unexpected error has ocurred, {e}."}
+    
 
 # Route for admins to update their group
 @group_bp.route("/<int:group_id>", methods=["PUT", "PATCH"])
