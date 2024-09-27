@@ -21,7 +21,7 @@ group_bp.register_blueprint(group_signup_bp)
 
 
 # GET method => /groups
-# Route to see all groups
+# Route for members to see all groups
 @group_bp.route("/")
 def get_all_groups():
     # Create and execute stmt, order by asc order
@@ -33,11 +33,11 @@ def get_all_groups():
         return groups_schema.dump(groups), 200
     # else error msg
     else:
-        return {"Error": "No groups to display."}, 400
+        return {"Error": "No groups created yet."}, 400
 
 
 # GET method => /groups/<group_id>
-# Route to see specific group
+# Route for members to see a specific group
 @group_bp.route("/<int:group_id>")
 def get_a_group(group_id):
     # Use stmt and filter_by to select a specific group
@@ -52,7 +52,7 @@ def get_a_group(group_id):
 
 
 # POST method => /groups
-# Route for admin to create a group 
+# Route to create group (only admin allowed, one group per admin)
 # @admin_group_check decorator ensure admin hasn't created a group yet
 @group_bp.route("/", methods=["POST"])
 @jwt_required()
@@ -78,6 +78,10 @@ def create_a_group():
 
         # Return the created group
         return group_schema.dump(group), 201
+    # Returns personalised msgs for data violation and general errors
+    except IntegrityError as err:
+        if err.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
+            return{"error": f"The column {err.orig.diag.column_name} is required"}, 400
     except Exception as e:
         return {"error": f"An unexpected error has ocurred, {e}."}
     
@@ -88,13 +92,21 @@ def create_a_group():
 @jwt_required()
 @auth_as_admin_decorator
 def update_group(group_id):
+    # Get admin id and ensure they are associated with group
+    user_id = get_jwt_identity()
+    associated_group = GroupLog.query.filter_by(user_id=user_id, group_id=group_id).first()
+
+    # If not owner, return error msg
+    if not associated_group:
+        return {"error": "You are not authorised to update this group."}, 403
     
-    # Get the fields from the body of the request, partial=True to update partial data
+    # Get the fields from the body of the request 
+    # partial=True to update partial data
     body_data = group_schema.load(request.get_json(), partial=True)
     stmt = db.select(Group).filter_by(id=group_id)
     group = db.session.scalar(stmt)
     
-    # If group exists, edit the required fields, else return error message
+    # If group exists, edit the required fields, else return error msg
     if group:
         group.name = body_data.get("name") or group.name
         # Commit changes to DB, return updated group
@@ -110,7 +122,14 @@ def update_group(group_id):
 @jwt_required()
 @auth_as_admin_decorator
 def delete_group(group_id):
-    
+    # Get admin id and ensure they are associated with group
+    user_id = get_jwt_identity()
+    associated_group = GroupLog.query.filter_by(user_id=user_id, group_id=group_id).first()
+
+    # If not owner, return error msg
+    if not associated_group:
+        return {"error": "You are not authorised to delete this group."}, 403   
+
     # Fetch the group from the DB with stmt
     stmt = db.select(Group).filter_by(id=group_id)
     group = db.session.scalar(stmt)

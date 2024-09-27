@@ -17,7 +17,8 @@ marathon_bp = Blueprint("marathons", __name__,url_prefix="/marathons")
 marathon_bp.register_blueprint(marathon_signup_bp)
 
 
-# Route for users to see all marathons 
+# GET method => /marathons
+# Route for users and admins to see all marathons 
 @marathon_bp.route("/")
 def get_all_marathons():
     # Fetch marathons from DB
@@ -32,7 +33,8 @@ def get_all_marathons():
         return {"Error": "No marathons to display."}, 400
 
 
-# Route for users to see a specific marathon
+# GET method => /marathons/<marathon_id>
+# Route for users and admins to see a specific marathon
 @marathon_bp.route("/<int:marathon_id>")
 def get_a_marathon(marathon_id):
     # filter_by to select a specific workout
@@ -46,7 +48,8 @@ def get_a_marathon(marathon_id):
         return {"error": f"Marathon with {marathon_id} not found."}, 404
 
 
-# Route for admins to create marathons
+# POST method => /marathons
+# Route for admins to create marathons, more than one allowed per admin.
 @marathon_bp.route("/", methods=["POST"])
 @jwt_required()
 @auth_as_admin_decorator
@@ -76,7 +79,6 @@ def register_marathon():
         db.session.commit()
         # Return acknowledgment message
         return marathon_schema.dump(marathon), 201
-    
     # Return personalised msgs for data violations and invalid data
     except DataError:
         return {"error": "Invalid input for integer value, only numbers allowed."}, 400 
@@ -87,6 +89,7 @@ def register_marathon():
         return {"error": "Invalid date format. Use YYYY-MM-DD."}, 400
 
 
+# PUT/PATCH methods => /marathons/<marathon_id>
 # Route for admins to update marathons events
 @marathon_bp.route("/<int:marathon_id>", methods=["PUT", "PATCH"])
 @jwt_required()

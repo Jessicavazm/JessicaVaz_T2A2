@@ -32,24 +32,6 @@ class GroupSchema(ma.Schema):
     # Name containing two names is allowed eg: 'Coder academy'
     name = fields.String(required=True, validate=And(Length(min=4, max=20, error="Name must be between 4 and 20 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
 
-
-    # # Decorator to valid if admin has created a group
-    # @validates("validate_admin_status")
-    # @jwt_required()
-    # def validate_admin_status(self, value):
-
-    #     user = get_jwt_identity()
-
-    #     if not user or not user.is_admin:
-    #         raise ValueError("Admin access required to create a group.")
-
-    #     existing_group = Group.query.filter_by(group_id=user.id).first()  
-    #     if existing_group:
-    #         raise ValueError("Admin can only create one group.")
-
-    #     return value
-
-    
     class Meta:
         fields = ["id", "name", "date_created", "logs", "group_logs", "marathon_logs"]
         ordered = True

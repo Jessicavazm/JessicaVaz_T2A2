@@ -29,7 +29,7 @@ def marathon_registration(marathon_id):
         # Get the admin user ID from the JWT token
         admin_id = get_jwt_identity()
 
-        # Retrieve group logs associated with the admin user
+        # Retrieve group log associated with the admin user
         group_logs = GroupLog.query.filter_by(user_id=admin_id).all()
         
         # If not group, instruct admin to create group first

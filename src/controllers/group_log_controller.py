@@ -9,8 +9,9 @@ from models.group_log import GroupLog
 # Create a blueprint for group enrollment
 group_signup_bp = Blueprint("join", __name__, url_prefix="/<int:group_id>/join")
 
-
-# Route for users to join a specific group
+# POST method => /groups/<group_id>/join
+# Route for regular users to join a specific group
+# Admin are only allowed to be part of their created group
 @group_signup_bp.route("/", methods=["POST"])  
 @jwt_required()
 def join_group(group_id):
@@ -31,6 +32,10 @@ def join_group(group_id):
         existing_entry = GroupLog.query.filter_by(user_id=user.id, group_id=group.id).first()
         if existing_entry:
             return {"error": "You are already a member of this group."}, 400
+        
+        # Prevent admins from joining any group
+        if user.is_admin:
+            return {"error": "Admins are only allowed to be part of their created group."}, 403
 
         # Create a new entry and add to the junction table
         new_entry = GroupLog(user_id=user.id, group_id=group.id)
@@ -45,7 +50,8 @@ def join_group(group_id):
         return {"error": f"An unexpected error occurred: {str(e)}"}, 500
 
 
-# Route for users to specific group
+# DELETE method => /groups/<group_id>/join
+# Route for regular users to leave a specific group
 @group_signup_bp.route("/", methods=["DELETE"]) 
 @jwt_required()
 def leave_group(group_id):
@@ -61,11 +67,15 @@ def leave_group(group_id):
         group = Group.query.get(group_id)
         if not group:
             return {"error": "Group not found."}, 404
-
-        # Fetch the entry from GroupLog table
+        
+        # Fetch the entry from GroupLog table, first method to ensure single record
         entry = GroupLog.query.filter_by(user_id=user.id, group_id=group.id).first()
         if not entry:
             return {"error": "You are not a member of this group."}, 400
+        
+        # Prevent admins from leaving their group
+        if user.is_admin:
+            return {"error": "Whoops! You can not leave your own group."}, 403
 
         # Remove the entry and return acknowledgment msg
         db.session.delete(entry)

@@ -6,7 +6,6 @@ from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
 
 from init import db, bcrypt
-
 from models.user import User, UserSchema, user_schema
 from utils import auth_as_admin_decorator
 
