@@ -35,7 +35,8 @@ class UserSchema(ma.Schema):
     name = fields.String(required=True, validate=And(Length(min=2, max=20, error="Name must be between 2 and 20 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
 
     # User email validation
-    email = fields.String(required=True, validate=And(Length(min=5, max=50, error="Email must be between 5 and 50 characters in length."), Regexp("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", error="Invalid email format: The email cannot have consecutive dots, must have a local part, a non-empty domain name and a top-level domain containing at least two letters. Valid characters includes letters, numbers, underscore, period, percent sign, plus sign and hyphen.")))
+    email = fields.String(required=True, validate=And(Length(min=5, max=50, error="Email must be between 5 and 50 characters in length."), Regexp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+            error="Invalid email format: The email cannot have consecutive dots, must have a local part, a non-empty domain name, and a top-level domain containing at least two letters. Valid characters include letters, numbers, underscore, period, percent sign, plus sign, and hyphen.")))
 
     # User password validation
     password = fields.String(required=True, validate=And(Length(min=6, max=20, error="Password must be a minimum of 6 characters and maximum of 20 characters."), Regexp(r"^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]{6,}$", error="Invalid password format. Password must contain one upper case letter, one digit and one special character.")))

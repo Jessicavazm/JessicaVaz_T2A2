@@ -32,10 +32,30 @@ def  create_app():
     jwt.init_app(app)
     
 
-    # Decorator to handle validation errors, return error msg
+    # Global decorators to handle errors
     @app.errorhandler(ValidationError)
     def validation_error(err):
         return {"error": err.messages}, 400
+    
+    @app.errorhandler(400)
+    def bad_request(err):
+        return {"error": err.messages}, 400
+
+    @app.errorhandler(401)
+    def unauthorised(error):
+        return {"error": "You are not an authorised user."}, 401
+    
+    @app.errorhandler(404)
+    def not_found(error):
+        return {"error": "The requested resource was not found."}, 404
+    
+    @app.errorhandler(405)
+    def not_found(error):
+        return {"error": "The requested method is not allowed."}, 405
+    
+    @app.errorhandler(500)
+    def internal_error(error):
+        return {"error": "An unexpected error occurred on the server."}, 500
 
 
     # Register blueprints

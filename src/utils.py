@@ -9,7 +9,7 @@ from models.group import Group
 from models.group_log import GroupLog
 
 
-# Create an admin decorator
+# Decorator to allow admin to perform specific functions
 # Implement the function inside of the decorator
 # Decorator and wraps method takes the 'function' parameter
 def auth_as_admin_decorator(fn):
@@ -31,20 +31,14 @@ def auth_as_admin_decorator(fn):
     return wrapper
 
 
+# Decorator to ensure admin can create only one group
 def admin_group_check_decorator(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         # Get user id with get_jwt_identity
         user_id = get_jwt_identity()  
-        # Check if the user is an admin
-        stmt = db.select(User).filter_by(id=user_id)
-        user = db.session.scalar(stmt)
 
-        # Returns error msg
-        if user is None or not user.is_admin:
-            return {"error": "Admin access required to create a group."}, 403
-
-        # Check if the admin has already created a group through group log table
+        # Check if the admin has already created a group user FK in groups table
         existing_group = Group.query.filter_by(created_by=user_id).first()
         if existing_group:
             return {"error": "Admin can only create one group."}, 403
