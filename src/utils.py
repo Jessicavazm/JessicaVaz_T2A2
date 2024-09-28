@@ -5,6 +5,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from init import db
 from models.user import User
+from models.group import Group
 from models.group_log import GroupLog
 
 
@@ -44,11 +45,10 @@ def admin_group_check_decorator(fn):
             return {"error": "Admin access required to create a group."}, 403
 
         # Check if the admin has already created a group through group log table
-        existing_group = GroupLog.query.filter_by(user_id=user_id).first()
+        existing_group = Group.query.filter_by(created_by=user_id).first()
         if existing_group:
             return {"error": "Admin can only create one group."}, 403
 
         # Execute the function
         return fn(*args, **kwargs)
-    
     return wrapper

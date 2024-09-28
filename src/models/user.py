@@ -20,6 +20,7 @@ class User(db.Model):
     # Cascade to delete workouts and group if user is deleted
     workouts = db.relationship("Workout", back_populates = "user", cascade="all, delete")
     group_logs = db.relationship("GroupLog", back_populates="user", cascade="all, delete")
+    group_created = db.relationship("Group", back_populates = "group_admin", cascade="all, delete")
 
 
 # Define 'user' schema and class 'Meta' fields to serialize/ deserialize data
@@ -28,7 +29,7 @@ class User(db.Model):
 class UserSchema(ma.Schema):
     workouts = fields.List(fields.Nested("WorkoutSchema", exclude=["user"]))
     group_logs = fields.List(fields.Nested("GroupLogSchema", exclude=["user"]))
-
+    group_created = fields.Nested("GroupSchema", only=["id", "name"])
 
     # User name validation, name containing two names is allowed eg: 'Coder academy'
     name = fields.String(required=True, validate=And(Length(min=2, max=20, error="Name must be between 2 and 20 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
@@ -39,11 +40,9 @@ class UserSchema(ma.Schema):
     # User password validation
     password = fields.String(required=True, validate=And(Length(min=6, max=20, error="Password must be a minimum of 6 characters and maximum of 20 characters."), Regexp(r"^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]{6,}$", error="Invalid password format. Password must contain one upper case letter, one digit and one special character.")))
 
-
     class Meta:
-        fields = ["id", "name", "email", "password", "is_admin", "workouts", "group_logs"]
+        fields = ["id", "name", "email", "password", "is_admin", "workouts", "group_logs", "group_created"]
         ordered = True 
-
 
 # Create schema objects to handle one or multiple items
 # Exclude password field for handling sensitive data

@@ -19,7 +19,7 @@ from utils import auth_as_admin_decorator
 marathon_signup_bp = Blueprint("signup", __name__,url_prefix="/<int:marathon_id>/signup")
 
 
-# Route for admin to enrol their group in marathon events
+# Route for admin to enrol their group in marathon event 
 # marathons/<marathon_id>/signup
 @marathon_signup_bp.route("/", methods=["POST"])
 @jwt_required()
@@ -29,7 +29,7 @@ def marathon_registration(marathon_id):
         # Get the admin user ID from the JWT token
         admin_id = get_jwt_identity()
 
-        # Retrieve group log associated with the admin user
+        # Retrieve group logs associated with the admin user
         group_logs = GroupLog.query.filter_by(user_id=admin_id).all()
         
         # If not group, instruct admin to create group first

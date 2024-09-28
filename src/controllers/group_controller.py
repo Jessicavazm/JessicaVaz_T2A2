@@ -60,20 +60,20 @@ def get_a_group(group_id):
 @admin_group_check_decorator
 def create_a_group():
     try:
-        # Get the fields from the request and create a new group
+         # Get the current admin user_id from the JWT 
+        user_id = get_jwt_identity()
+
+        # Fetch the data from the body of request
         body_data = group_schema.load(request.get_json())
+        
+        # Create the new group and assign the admin as the creator 
         group = Group(
             name=body_data.get("name"),
-            date_created=date.today()
+            date_created=date.today(),
+            created_by=user_id  
         )
-
-        # Add the new group to the database
+        # Add the new group to DB, and return acknowledgment msg
         db.session.add(group)
-        db.session.commit()
-
-        # Log the changes in GroupLog table
-        group_log = GroupLog(user_id=get_jwt_identity(), group_id=group.id)
-        db.session.add(group_log)
         db.session.commit()
 
         # Return the created group
@@ -122,23 +122,20 @@ def update_group(group_id):
 @jwt_required()
 @auth_as_admin_decorator
 def delete_group(group_id):
-    # Get admin id and ensure they are associated with group
+    # Fetch user ID
     user_id = get_jwt_identity()
-    associated_group = GroupLog.query.filter_by(user_id=user_id, group_id=group_id).first()
+    
+    # Fetch the group from the DB and check ownership
+    stmt = db.select(Group).filter_by(id=group_id, created_by=user_id)
+    group = db.session.scalar(stmt)
 
-    # If not owner, return error msg
-    if not associated_group:
+    # If the group does not exist or the user is not the owner, return error msg
+    if not group:
         return {"error": "You are not authorised to delete this group."}, 403   
 
-    # Fetch the group from the DB with stmt
-    stmt = db.select(Group).filter_by(id=group_id)
-    group = db.session.scalar(stmt)
+    # If the group exists, delete it and return acknowledgment msg
+    db.session.delete(group)
+    db.session.commit()
     
-    # If group exists, delete it, else return error message
-    if group:
-        db.session.delete(group)
-        db.session.commit()
-        return {"message": f"Group {group.id} has been deleted successfully!"}, 200
-    else:
-        return {"error": f"Group {group_id} has not been found."}, 404
+    return {"message": f"Group {group.id} has been deleted successfully!"}, 200
 

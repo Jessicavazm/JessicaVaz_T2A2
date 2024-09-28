@@ -30,7 +30,7 @@ def get_all_marathons():
         return marathons_schema.dump(marathons), 200
     # Else returns error msg
     else:
-        return {"Error": "No marathons to display."}, 400
+        return {"Error": "No marathons created yet."}, 400
 
 
 # GET method => /marathons/<marathon_id>

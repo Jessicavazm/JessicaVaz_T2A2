@@ -68,7 +68,7 @@ def leave_group(group_id):
         if not group:
             return {"error": "Group not found."}, 404
         
-        # Fetch the entry from GroupLog table, first method to ensure single record
+        # Fetch the entry from GroupLog table, if not entry return error msg
         entry = GroupLog.query.filter_by(user_id=user.id, group_id=group.id).first()
         if not entry:
             return {"error": "You are not a member of this group."}, 400

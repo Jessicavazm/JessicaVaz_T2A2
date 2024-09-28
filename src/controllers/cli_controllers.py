@@ -22,6 +22,7 @@ def create_tables():
     print("Tables created!")
 
 # Command to seed the tables
+# Commit the users to be able to create a group
 @db_commands.cli.command("seed")
 def seed_tables():
     # Add users to users table
@@ -46,6 +47,7 @@ def seed_tables():
     ]
     # Add created users to DB
     db.session.add_all(users)
+    db.session.commit()
 
     # Add workouts to workouts table
     workouts = [
@@ -68,14 +70,17 @@ def seed_tables():
     db.session.add_all(workouts)
 
     # Add running groups to groups table
+    # Commit groups to be able to enrol in marathons
     groups = [
             Group(
                 name="Group A",
-                date_created=date.today()
+                date_created=date.today(),
+                created_by=users[0].id
             ),
             Group(
                 name="Group B",
-                date_created=date.today()
+                date_created=date.today(),
+                created_by=users[1].id
             )
         ]
     # Add created groups to DB
