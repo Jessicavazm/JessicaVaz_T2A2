@@ -6,33 +6,40 @@ from sqlalchemy.exc import SQLAlchemyError
 from psycopg2 import errorcodes
 
 from init import db
-from models.marathon_log import MarathonLog, marathon_log_schema, marathon_logs_schema
+
+from models.marathon_log import MarathonLog, marathon_log_schema
 from models.user import User
 from models.group import Group
-from models.marathon import Marathon, marathon_schema, marathons_schema
+from models.marathon import Marathon
+from models.group_log import GroupLog
 from utils import auth_as_admin_decorator
 
 
 # Create marathon sign up blueprint
-marathon_signup_bp = Blueprint("join", __name__,url_prefix="/<int:marathon_id>/logs")
+marathon_signup_bp = Blueprint("signup", __name__,url_prefix="/<int:marathon_id>/signup")
 
 
 # Route for admin to enrol their group in marathon event 
+# marathons/<marathon_id>/signup
 @marathon_signup_bp.route("/", methods=["POST"])
 @jwt_required()
 @auth_as_admin_decorator
 def marathon_registration(marathon_id):
     try:
-        # Get the admin using JWT 
+        # Get the admin user ID from the JWT token
         admin_id = get_jwt_identity()
-        admin_user = User.query.get(admin_id) 
 
-        # Get the group associated with the admin
-        group = Group.query.get(admin_user.group_id)
-        if not group:
-            return {"error": "You don't have a group to enrol, please create a group first."}, 404
+        # Retrieve group logs associated with the admin user
+        group_logs = GroupLog.query.filter_by(user_id=admin_id).all()
+        
+        # If not group, instruct admin to create group first
+        if not group_logs:
+            return {"error": "You don't have a group to enroll, please create a group first."}, 404
 
-        # Check if the marathon exists
+        # Get the first group from the user's group logs
+        group = Group.query.get(group_logs[0].group_id)
+
+        # Check if the specified marathon exists
         marathon = Marathon.query.get(marathon_id)
         if not marathon:
             return {"error": "Marathon doesn't exist, please choose an available event."}, 404
@@ -40,31 +47,32 @@ def marathon_registration(marathon_id):
         # Check if the group is already signed up for this marathon
         existing_log = MarathonLog.query.filter_by(group_id=group.id, marathon_id=marathon_id).first()
         if existing_log:
-            return {"error": f"This group is already enrolled in this marathon."}, 400
+            return {"error": "This group is already enrolled in this marathon."}, 400
 
-        # Create the log entry
+        # Create a new log entry for the marathon
         log_entry = MarathonLog(
-            entry_created=date.today(),
-            group_id=group.id,
-            marathon_id=marathon_id  
+            entry_created=date.today(),  
+            group_id=group.id,           
+            marathon_id=marathon_id       
         )
 
-        # Add the log entry to the DB
+        # Add the log entry to the database session
         db.session.add(log_entry)
-        db.session.commit()
+        db.session.commit()  
 
-        # Return marathon log
+        # Return marathon entry
         return marathon_log_schema.dump(log_entry), 201
 
     # Handle DB and any possible errors
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         return {"error": "A database error has occurred. Please try again."}, 500
     except Exception as e:
-         return {"error": f"An error has occurred: {e}"}, 500   
-
+        return {"error": f"An error has occurred: {e}"}, 500 
+   
 
 # Route for admin to remove their group from marathon event
-@marathon_signup_bp.route("/<int:log_id>", methods=["DELETE"])
+# /<marathon_id>/signup/logs/<log_id>
+@marathon_signup_bp.route("/logs/<int:log_id>", methods=["DELETE"])
 @jwt_required()
 @auth_as_admin_decorator
 def delete_log(marathon_id, log_id):

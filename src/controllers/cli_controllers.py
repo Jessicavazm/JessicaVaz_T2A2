@@ -1,5 +1,7 @@
 from datetime import date
+
 from flask import Blueprint
+
 from init import db, bcrypt
 from models.user import User
 from models.workout import Workout
@@ -8,8 +10,10 @@ from models.marathon import Marathon
 from models.marathon_log import MarathonLog
 from models.group_log import GroupLog 
 
+
 # Create db_commands blueprint
 db_commands = Blueprint("db", __name__)
+
 
 # Command to create tables
 @db_commands.cli.command("create")
@@ -18,43 +22,44 @@ def create_tables():
     print("Tables created!")
 
 # Command to seed the tables
+# Commit the users to be able to create a group
 @db_commands.cli.command("seed")
 def seed_tables():
-
     # Add users to users table
     users = [
         User(
             name="User A",
             email="admin_a@email.com",
-            password=bcrypt.generate_password_hash("123456").decode("utf-8"),
+            password=bcrypt.generate_password_hash("Brazil1.").decode("utf-8"),
             is_admin=True
         ), 
         User(
             name="User B",
-            email="user_b@email.com",
-            password=bcrypt.generate_password_hash("123456").decode("utf-8"),
+            email="admin_b@email.com",
+            password=bcrypt.generate_password_hash("Brazil2.").decode("utf-8"),
             is_admin=True
         ),
         User(
             name="User C",
             email="user_c@email.com",
-            password=bcrypt.generate_password_hash("123456").decode("utf-8")
+            password=bcrypt.generate_password_hash("Brazil2.").decode("utf-8")
         )
     ]
     # Add created users to DB
     db.session.add_all(users)
+    db.session.commit()
 
     # Add workouts to workouts table
     workouts = [
         Workout(
-            title="Running with friend",
+            title="Outside run",
             date=date.today(),
             distance_kms=10,
             calories_burnt=235,
             user=users[0]
         ), 
         Workout(
-            title="Running alone",
+            title="Outside run",
             date=date.today(),
             distance_kms=10,
             calories_burnt=250,
@@ -64,22 +69,23 @@ def seed_tables():
     # Add created workouts to DB
     db.session.add_all(workouts)
 
-
     # Add running groups to groups table
+    # Commit groups to be able to enrol in marathons
     groups = [
             Group(
                 name="Group A",
-                date_created=date.today()
+                date_created=date.today(),
+                created_by=users[0].id
             ),
             Group(
                 name="Group B",
-                date_created=date.today()
+                date_created=date.today(),
+                created_by=users[1].id
             )
         ]
     # Add created groups to DB
     db.session.add_all(groups)
     db.session.commit()
-
 
     # Add marathon events to marathons table
     marathons = [
@@ -109,7 +115,7 @@ def seed_tables():
         GroupLog(
             entry_created=date.today(),
             user=users[1],
-            group=groups[0]
+            group=groups[1]
         )
     ]
     # Add created group logs to DB

@@ -8,7 +8,7 @@ class GroupLog(db.Model):
     __tablename__ = "group_logs"
 
     id = db.Column(db.Integer, primary_key=True)
-    entry_created = db.Column(db.Date) 
+    entry_created = db.Column(db.Date, default=date.today) 
     
     # Foreign keys to reference both 'users' and 'groups' tables
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -23,7 +23,7 @@ class GroupLog(db.Model):
 # Unpack complex data with fields.Nested method
 # Exclude group_logs from user and group schema to avoid redundant data info
 class GroupLogSchema(ma.Schema):
-    user = fields.Nested("UserSchema", exclude=["group_logs"])
+    user = fields.Nested("UserSchema", only=["id", "name", "email"])
     group = fields.Nested("GroupSchema", exclude=["group_logs"])
     class Meta:
         fields = ["id", "entry_created", "user", "group"]
