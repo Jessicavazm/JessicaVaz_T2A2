@@ -10,7 +10,7 @@ class User(db.Model):
 
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
@@ -32,7 +32,7 @@ class UserSchema(ma.Schema):
     group_created = fields.Nested("GroupSchema", only=["id", "name"])
 
     # User name validation, name containing two names is allowed eg: 'Coder academy'
-    name = fields.String(required=True, validate=And(Length(min=2, max=20, error="Name must be between 2 and 20 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
+    name = fields.String(required=True, validate=And(Length(min=2, max=30, error="Name must be between 2 and 30 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
 
     # User email validation
     email = fields.String(required=True, validate=And(Length(min=5, max=50, error="Email must be between 5 and 50 characters in length."), Regexp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",

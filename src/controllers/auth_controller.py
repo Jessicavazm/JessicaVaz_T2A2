@@ -7,7 +7,6 @@ from psycopg2 import errorcodes
 
 from init import db, bcrypt
 from models.user import User, UserSchema, user_schema
-from utils import auth_as_admin_decorator
 
 
 # Authorisation blueprint
@@ -22,10 +21,10 @@ def register_user():
         # Get the data from the body of the request, including password
         body_data = UserSchema().load(request.get_json())
         
-        # Create an instance of User model
+        # Create an instance of User model, lower to ensure unique email 
         user = User(
             name = body_data.get("name"),
-            email = body_data.get("email")
+            email = body_data.get("email").lower()
         )
         # If user provides password, hash it
         password = body_data.get("password")
@@ -44,7 +43,7 @@ def register_user():
         if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
             return {"error": "Email address must be unique"}, 400
     except Exception as e:
-        return {"error": f"An unexpected error has ocurred {e}"}
+        return {"error": f"An unexpected error has occurred {e}"}
 
 
 # POST method = auth/login
@@ -53,6 +52,11 @@ def register_user():
 def login_user():
     # Get data from request body
     body_data = request.get_json()
+
+    # If not returns error msg for missing field 
+    if not body_data.get("email") or not body_data.get("password"):
+        return {"error": "Email and password are required."}, 400
+    
     # Stmt to find user in DB with that specific email
     stmt = db.select(User).filter_by(email=body_data["email"])
     user = db.session.scalar(stmt)
@@ -69,7 +73,7 @@ def login_user():
 
 # PUT, PATCH method => /auth/users/<user_id>
 # Route for users to update their info
-@auth_bp.route("/users", methods = ["PUT", "PATCH"])
+@auth_bp.route("/users/", methods = ["PUT", "PATCH"])
 @jwt_required()
 def update_user():
     try:    
@@ -82,13 +86,13 @@ def update_user():
         
         # If the user exist, update the required fields
         if user:
-            # 'OR' statement evaluates what comes true first and execute it
-            user.name = body_data.get("name") or user.name
-            user.email = body_data.get("email") or user.email
-            
-            if password:
-                user.password = bcrypt.generate_password_hash(password).decode("utf-8")
-                return {"msg": "Password has been successfully updated."}
+            if body_data.get("name") is not None:  
+                user.name = body_data["name"]
+            if body_data.get("email") is not None:  
+                user.email = body_data["email"].lower()
+            if password is not None:
+                user.password = bcrypt.generate_password_hash(password).decode("utf-8") 
+                
             # Commit to the DB
             db.session.commit()
             # Return an acknowledgement msg
@@ -102,7 +106,7 @@ def update_user():
             return {"error": "Email address must be unique"}, 400
     # Catches general errors and display info
     except Exception as e:
-        return {"error": f"An unexpected error has ocurred {e}"}
+        return {"error": f"An unexpected error has occurred {e}"}
 
 
 # DELETE method => /auth/users/<user_id>

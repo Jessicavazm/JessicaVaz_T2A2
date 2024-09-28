@@ -3,10 +3,8 @@ from datetime import date
 from flask import Blueprint
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy.exc import SQLAlchemyError
-from psycopg2 import errorcodes
 
 from init import db
-
 from models.marathon_log import MarathonLog, marathon_log_schema
 from models.user import User
 from models.group import Group

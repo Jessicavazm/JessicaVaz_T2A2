@@ -83,7 +83,7 @@ def create_a_group():
         if err.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
             return{"error": f"The column {err.orig.diag.column_name} is required"}, 400
     except Exception as e:
-        return {"error": f"An unexpected error has ocurred, {e}."}
+        return {"error": f"An unexpected error has occurred, {e}."}
     
 
 # PUT, PATCH methods => /groups/<group_id>

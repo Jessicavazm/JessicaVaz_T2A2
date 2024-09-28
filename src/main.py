@@ -38,8 +38,8 @@ def  create_app():
         return {"error": err.messages}, 400
     
     @app.errorhandler(400)
-    def bad_request(err):
-        return {"error": err.messages}, 400
+    def handle_bad_request(err):
+        return{"error": "Bad request. Please check your input."}, 400
 
     @app.errorhandler(401)
     def unauthorised(error):
