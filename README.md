@@ -1,7 +1,6 @@
 # Marathon running app
 
 ## R1 
-### What problem this solves?
 
 The Marathon Running API is designed to bring runners together. It has functionality for runners to log their workouts and keep track of workout sessions. In the workout log feature, users are allowed to choose from one of the available run types. Date and distance in kilometers are also required to ensure the log keeps all the crucial information for users to track their best sessions. However, the main functionality of my API is to allow users to be part of running groups. 
 
@@ -15,7 +14,6 @@ I believe this app combines two important things: staying healthy and making fri
 
 
 ## R2 
-### How are the tasks tracked?
 
 I have tracked tasks and changes using GitHub and Trello. To manage the development of different features—especially since this was my first time creating an API. I created a new branch for each feature. This approach allowed me to keep a clear record of all changes in case I needed to revert to previous code. In total, I have created nine different branches for this project. 
 
@@ -61,7 +59,6 @@ Bellow, I have attached some screenshots of my trello board and git commits.
 
 
 ## R3 
-### Third-party services, packages and dependencies used in this app.
 
 - Virtual environment
 Virtual environment is used to isolate the project to not interfere with other projects.
@@ -123,7 +120,6 @@ Built-in validators that can be used to enforce data validation. These validatio
 
 
 ## R4 
-### Benefits and drawbacks of this app’s underlying database system.
 
 Postgresql serves as open-source relational database management system (RDBMS) that enables users to store, manage, and retrieve data efficiently and securely. It's stores data in a practical and easy to manage way. Data is stored in DB using tables where tables are the entities, attributes are the columns and objects are the rows.
 
@@ -236,9 +232,7 @@ Overall, SQLAlchemy provides a great framework for building applications that re
 			return {"Error": "No workout logs to display for this user."}, 400
 
 
-## R6 - 
-
-### Explain how the relations between the diagrammed models will aid the database design
+## R6 
 
 Important: As I continued with my project, I realized I needed to add an extra table to my diagram to store entries from users in groups. This new change will allow me to organize user entries in groups more effectively.
 
@@ -249,72 +243,71 @@ I have also added a new foreign key in the groups table for the created_by attri
 ### Models:
 
 #### User: 
-- id: PK
-- name: not null
-- email: not null
-- password: not null
-- is_admin: default=False
+	- id: PK
+	- name: not null
+	- email: not null
+	- password: not null
+	- is_admin: default=False
 
 #### Workout
-- id: PK
-- title: not null
-- date_created: not null
-_ distance_kms: not null
-- calories_burnt
-- user_id (FK referencing user who created workout log)
+	- id: PK
+	- title: not null
+	- date_created: not null
+	_ distance_kms: not null
+	- calories_burnt
+	- user_id (FK referencing user who created workout log)
 
 #### Groups
-id: PK
-name: not null
-date_created: date
-created_by: user_id (FK referencing the admin who created the group)
+	id: PK
+	name: not null
+	date_created: date
+	created_by: user_id (FK referencing the admin who created the group)
 
 #### Group_logs
-id: PK
-date_created: date
-user_id: FK (referencing the user who entered the group), not null
-group_id: FK (referencing the group the user entered), not null
+	id: PK
+	date_created: date
+	user_id: FK (referencing the user who entered the group), not null
+	group_id: FK (referencing the group the user entered), not null
 
 #### Marathons
-id: PK
-name: not null
-event_date: not null
-location: not null
-distance_kms: not null
+	id: PK
+	name: not null
+	event_date: not null
+	location: not null
+	distance_kms: not null
 
 #### Marathons_logs
-id: not null
-date_created: not null
-group_id: FK(referencing the group who entered the marathon event), not null
-marathon_id: FK (referencing the what marathon event the group entered), not null
+	id: not null
+	date_created: not null
+	group_id: FK(referencing the group who entered the marathon event), not null
+	marathon_id: FK (referencing the what marathon event the group entered), not null
 
 ### Relationships:
-- User can log many workout logs
-- Workout log belongs to one user
-- User can be part of many groups
-- A group can have many users
-- A group can be created by only one user
-- Groups can enter many marathons
-- Marathons can be entered by many groups
+	- User can log many workout logs
+	- Workout log belongs to one user
+	- User can be part of many groups
+	- A group can have many users
+	- A group can be created by only one user
+	- Groups can enter many marathons
+	- Marathons can be entered by many groups
 
 
 ## R7 
-### Explain the implemented models and their relationships, including how the relationships aid the database implementation.
 
 ## User
 
 ### Attributes
 Nullable constraint to ensure data input and unique=True to ensure email is unique
 
-- id = db.Column(db.Integer, primary_key=True)
-- name = db.Column(db.String(30), nullable=False)
-- email = db.Column(db.String(50), nullable=False, unique=True)
-- password = db.Column(db.String, nullable=False)
-- is_admin = db.Column(db.Boolean, default=False)
+	- id = db.Column(db.Integer, primary_key=True)
+	- name = db.Column(db.String(30), nullable=False)
+	- email = db.Column(db.String(50), nullable=False, unique=True)
+	- password = db.Column(db.String, nullable=False)
+	- is_admin = db.Column(db.Boolean, default=False)
     
 ### Relationship
-Bi-directional relationship with workouts, group_logs and group_created to ensure data is shared across 
-requested tables.
+	Bi-directional relationship with workouts, group_logs and group_created to ensure data is shared across 
+	requested tables.
 
 ### User schema
 Validation on user's name, email, password.
@@ -340,55 +333,59 @@ Validation on user's name, email, password.
 - distance_kms = db.Column(db.Integer, nullable=False)
 - calories_burnt = db.Column(db.Integer)
 
-# FK to reference 'users' table
--user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+### FK to reference 'users' table
+	- user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-- Bidirectional relationships with 'users' table
+### Bidirectional relationships with 'users' table
 	user = db.relationship("User", back_populates = "workouts")
 
-### Workout Schema
+## Workout Schema
 
 - Title validation using a constant
 	title = fields.String(required=True, validate=OneOf(VALID_STATUSES))
     
 - Class Meta:
-    fields = ["id", "title", "date", "distance_kms", "calories_burnt", "user"]
+	fields = ["id", "title", "date", "distance_kms", "calories_burnt", "user"]
 
-### Group
+## Group
 
-# Attributes
-- id = db.Column(db.Integer, primary_key=True)
-- name = db.Column(db.String(30), nullable=False)
-- date_created = db.Column(db.Date, default=date.today)
-- created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True)
+### Attributes
+	- id = db.Column(db.Integer, primary_key=True)
+	- name = db.Column(db.String(30), nullable=False)
+	- date_created = db.Column(db.Date, default=date.today)
+	- created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True)
 
 ### Bidirectional relationships with group_admin creator, groups_logs and marathons_logs
-    group_admin = db.relationship("User", back_populates= "group_created")
-    group_logs = db.relationship("GroupLog", back_populates= "group", cascade="all, delete")
-    marathon_logs = db.relationship("MarathonLog", back_populates= "group", cascade="all, delete")
+    - group_admin = db.relationship("User", back_populates= "group_created")
+
+    - group_logs = db.relationship("GroupLog", back_populates= "group", cascade="all, delete")
+
+    - marathon_logs = db.relationship("MarathonLog", back_populates= "group", cascade="all, delete")
 
 ### Group schema
 
 - Validation for attribute 'name':
-    name = fields.String(required=True, validate=And(Length(min=4, max=30, error="Name must be between 4 and 30 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
+	- Name must be between 4 and 30 characters in length.Name must start with an uppercase letter and contain only letters."
 
-- class Meta:
+### Class Meta
 	fields = ["id", "name", "date_created", "created_by", "group_admin", "group_logs", "marathon_logs"]
       
 ## Group_logs
 
 ### Attributes
 
-- id = db.Column(db.Integer, primary_key=True)
-- entry_created = db.Column(db.Date, default=date.today) 
+	- id = db.Column(db.Integer, primary_key=True)
+	- entry_created = db.Column(db.Date, default=date.today) 
 
 ### Foreign keys to reference both 'users' and 'groups' tables
 - user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
 - group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
 
 ### Bi directional relationships with 'users' and 'groups' tables
-user = db.relationship("User", back_populates="group_logs")
-group = db.relationship("Group", back_populates="group_logs")
+	user = db.relationship("User", back_populates="group_logs")
+
+	group = db.relationship("Group", back_populates="group_logs")
 
 ### Group_log schema
 class Meta:
@@ -399,14 +396,15 @@ class Meta:
 
 ### Attributes
 
-- id = db.Column(db.Integer, primary_key=True)
-- name = db.Column(db.String(30), nullable=False)
-- event_date = db.Column(db.Date, nullable=False)
-- location = db.Column(db.String(50), nullable=False)
-- distance_kms = db.Column(db.Integer, nullable=False)
-    
+	- id = db.Column(db.Integer, primary_key=True)
+	- name = db.Column(db.String(30), nullable=False)
+	- event_date = db.Column(db.Date, nullable=False)
+	- location = db.Column(db.String(50), nullable=False)
+	- distance_kms = db.Column(db.Integer, nullable=False)
+		
 ### Bidirectional relationships with 'marathon_logs' table
-- Cascade to delete marathon_logs and group if marathon is deleted
+- Cascade to delete marathon_logs and group if marathon is deleted.
+
     marathon_logs = db.relationship("MarathonLog", back_populates="marathon", cascade="all, delete")
 
 ### Schemas
@@ -423,16 +421,18 @@ class Meta:
 ## Marathon_logs table
 
 ### Attributes
-- id = db.Column(db.Integer, primary_key=True)
-- entry_created = db.Column(db.Date, default=date.today) 
+	- id = db.Column(db.Integer, primary_key=True)
+	- entry_created = db.Column(db.Date, default=date.today) 
 
-# Foreign keys to reference both 'groups' and 'marathons' tables
-- group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
-- marathon_id = db.Column(db.Integer, db.ForeignKey("marathons.id"), nullable=False)
+### Foreign keys to reference both 'groups' and 'marathons' tables
+	- group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
 
-# Bidirectional relationships with 'groups' and 'marathons' tables
-group = db.relationship("Group", back_populates="marathon_logs")
-marathon = db.relationship("Marathon", back_populates="marathon_logs")
+	- marathon_id = db.Column(db.Integer, db.ForeignKey("marathons.id"), nullable=False)
+
+### Bidirectional relationships with 'groups' and 'marathons' tables
+	- group = db.relationship("Group", back_populates="marathon_logs")
+	
+	- marathon = db.relationship("Marathon", back_populates="marathon_logs")
 
 ### Marathon_logs Schema
 - class Meta:
