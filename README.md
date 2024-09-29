@@ -1,8 +1,17 @@
-# JessicaVaz_T2A2
+# Marathon running app
 
-Requirements
+R1 - 
+# What problem this solves?
+The Marathon Running API is designed to bring runners together. It has functionality for runners to log their workouts and keep track of workout sessions. In the workout log feature, users are allowed to choose from one of the available run types. Date and distance in kilometers are also required to ensure the log keeps all the crucial information for users to track their best sessions. However, the main functionality of my API is to allow users to be part of running groups. 
 
-R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.
+Running alone can sometimes feel a bit lonely, but when you run in a group, it encourages you to push yourself a little harder, and then the run becomes more enjoyable. This app strives to motivate it's members through accountability. 
+
+Each group will have an admin who will enroll their group in marathons created by different group admins. It’s very practical for users: they can check the available groups and choose which group they want to join, and they can even be part of more than one group. When checking the groups, users will be able to see who the admin of that group is, the group’s members, and what marathons that group is currently enrolled in.
+
+Admins are responsible for creating marathon events and managing any changes, such as location or date.This app takes out all of the hassle log into marathon events individually. Users simply need to select a group and lace up their best pair of shoes to start running.
+
+I believe this app combines two important things: staying healthy and making friends. It also very flexible, allowing the members to choose what group resinates more with them and having the choice to leave the group at any time. 
+
 
 R2 - Describe the way tasks are allocated and tracked in your project.
 
@@ -14,7 +23,7 @@ R5 - Explain the features, purpose and functionalities of the object-relational 
 
 R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
 
-![Initial ER Diagram](./docs/API.drawio.png)
+![ER diagram](./docs/Marathon_API.drawio.png)
 
 R7 - Explain the implemented models and their relationships, including how the relationships aid the database implementation.
 
@@ -22,7 +31,7 @@ This should focus on the database implementation AFTER coding has begun, eg. dur
 
 # R8 
 
-## USERS endpoints
+## Users endpoints
 
 
 ### Route for users to register:
@@ -445,7 +454,7 @@ When request is successful, the created group will be displayed back to admin us
 ### Response: 
 
 When request is successful, the updated group will be displayed back to admin user. Example:
-	{
+	
 	"id": 3,
 	"name": "Girls Run",
 	"date_created": "2024-09-29",
@@ -455,7 +464,7 @@ When request is successful, the updated group will be displayed back to admin us
 	},
 	"group_logs": [],
 	"marathon_logs": []
-	}
+	
 
 ### Possible errors:
 - Not authorised user
@@ -478,10 +487,10 @@ When request is successful, the updated group will be displayed back to admin us
 
 ### Response: 
 
-When request is successful, an acknowledgment msg will be displayed back to admin user. Example:
-	{
+When request is successful, an acknowledgment msg will be displayed back to the admin user. Example:
+	
 	"message": "Group 4 has been deleted successfully!"
-	}	
+	
 
 ### Possible errors:
 - Group not found
@@ -506,9 +515,9 @@ When request is successful, an acknowledgment msg will be displayed back to admi
 ### Response
 
 When request is successful, an acknowledgment msg will be displayed back to user. Example:
-	{
+	
 	"message": "Luke is officially part of the group named Group A."
-	}
+	
 
 ### Possible errors:
 - Group doesn't exist
@@ -534,9 +543,9 @@ When request is successful, an acknowledgment msg will be displayed back to user
 ### Response
 
 When request is successful, an acknowledgment msg will be displayed back to user. Example:
-	{
+	
 	"message": "You have successfully left the group named Group B."
-	}
+	
 
 ### Possible errors:
 - Group not found
@@ -562,32 +571,31 @@ When request is successful, an acknowledgment msg will be displayed back to user
 
 ### Response: 
 When request is successful, the groups will be displayed back to user. Example:
-{
+
+	{
 	"id": 2,
 	"name": "Coder Run",
 	"event_date": "2025-10-08",
 	"location": "Melbourne",
 	"distance_kms": 20,
-	"marathon_logs": [
+	"marathon_logs": 
 		{
 			"id": 1,
 			"entry_created": "2024-09-29"
 		}
-	]
-},
-{
+	}
+	{
 	"id": 1,
 	"name": "Marathon A",
 	"event_date": "2026-12-12",
 	"location": "Gold Coast",
 	"distance_kms": 10,
-	"marathon_logs": [
+	"marathon_logs": 
 		{
 			"id": 2,
 			"entry_created": "2024-09-29"
 		}
-	]
-}
+	}
 
 ### Possible errors:
 - Marathons has not been created yet
@@ -642,14 +650,14 @@ When request is successful, the requested marathon will be displayed back to use
 ### Response
 
 When request is successful, the marathon event will be displayed back to user. Example:
-	{
+	
 	"id": 4,
 	"name": "Coder Marathon",
 	"event_date": "2025-12-01",
 	"location": "12 O'Connor, Melbourne",
 	"distance_kms": 15,
 	"marathon_logs": []
-	}
+	
 
 ### Possible errors:
 - Not authenticated user
@@ -679,14 +687,13 @@ When request is successful, the marathon event will be displayed back to user. E
 
 ### Body of response
 When request is successful, the new marathon info will be displayed back to admin user. Example:	
-	{
+	
 	"id": 4,
 	"name": "Coder Marathon",
 	"event_date": "2025-12-01",
 	"location": "Opera house, Sydney",
 	"distance_kms": 15,
 	"marathon_logs": []
-	}
 
 ### Possible errors:
 - Not authenticated user 
@@ -695,8 +702,6 @@ When request is successful, the new marathon info will be displayed back to admi
 - Name, event date, location, and distance violations
 
 ![Updated successfully](./docs/marathons/update_marathons/update_successful.png)
-
-![Invalid date](./docs/marathons/update_marathons/)
 
 ![Invalid data type](./docs/marathons/update_marathons/invalid_data_type.png)
 
@@ -735,7 +740,7 @@ When request is successful, an acknowledgment msg will be displayed back to admi
 ### Response
 When request is successful, the log entry containing group and marathon event information will be displayed back to the admin. Example:
 
-{
+
 	"id": 4,
 	"entry_created": "2024-09-29",
 	"group": {
@@ -765,7 +770,7 @@ When request is successful, the log entry containing group and marathon event in
 		"location": "12 O'Connor, Melbourne",
 		"distance_kms": 15
 	}
-}
+
 
 ### Possible errors:
 - Not authenticated user
@@ -789,9 +794,9 @@ When request is successful, the log entry containing group and marathon event in
 
 ### Response
 When request is successful, an acknowledgment msg will be sent back to admin. Example:
-	{
+	
 	"message": "Group A has been successfully removed from Marathon B event."
-	}
+
 
 ### Possible errors:
 - Not authenticated user

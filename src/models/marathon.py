@@ -10,7 +10,7 @@ class Marathon(db.Model):
 
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(30), nullable=False)
     event_date = db.Column(db.Date, nullable=False)
     location = db.Column(db.String(50), nullable=False)
     distance_kms = db.Column(db.Integer, nullable=False)
@@ -26,7 +26,7 @@ class MarathonSchema(ma.Schema):
     marathon_logs = fields.List(fields.Nested("MarathonLogSchema", only=["id", "entry_created"]))
     
     # Validation for 'name'. Name containing two names is allowed eg: 'Coder academy'
-    name = fields.String(required=True, validate=And(Length(min=4, max=20, error="Name must be between 4 and 20 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
+    name = fields.String(required=True, validate=And(Length(min=4, max=30, error="Name must be between 4 and 30 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
     
     # Validation for attribute 'location'
     # Allows letter, numbers, spaces, apostrophes and commas eg: Location: 12 O'Connor st, Melbourne

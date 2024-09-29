@@ -1,7 +1,6 @@
 from datetime import date
-from marshmallow import fields, validates
-from marshmallow.validate import Length, And, Regexp, OneOf
-from marshmallow.exceptions import ValidationError
+from marshmallow import fields
+from marshmallow.validate import Length, And, Regexp
 
 from init import db, ma
 
@@ -12,7 +11,7 @@ class Group(db.Model):
 
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(30), nullable=False)
     date_created = db.Column(db.Date, default=date.today)
     created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True)
 
@@ -33,7 +32,7 @@ class GroupSchema(ma.Schema):
 
     # Validation for attribute 'name', 
     # Name containing two names is allowed eg: 'Coder academy'
-    name = fields.String(required=True, validate=And(Length(min=4, max=20, error="Name must be between 4 and 20 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
+    name = fields.String(required=True, validate=And(Length(min=4, max=30, error="Name must be between 4 and 30 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
 
     class Meta:
         fields = ["id", "name", "date_created", "created_by", "group_admin", "group_logs", "marathon_logs"]
