@@ -2,6 +2,7 @@
 
 ## R1 
 ### What problem this solves?
+
 The Marathon Running API is designed to bring runners together. It has functionality for runners to log their workouts and keep track of workout sessions. In the workout log feature, users are allowed to choose from one of the available run types. Date and distance in kilometers are also required to ensure the log keeps all the crucial information for users to track their best sessions. However, the main functionality of my API is to allow users to be part of running groups. 
 
 Running alone can sometimes feel a bit lonely, but when you run in a group, it encourages you to push yourself a little harder, and then the run becomes more enjoyable. This app strives to motivate it's members through accountability to achieve a healthier life style. The goal is to turn exercising into a fun and engaging experience rather than a chore.
@@ -19,7 +20,6 @@ I believe this app combines two important things: staying healthy and making fri
 I have tracked tasks and changes using GitHub and Trello. To manage the development of different features—especially since this was my first time creating an API. I created a new branch for each feature. This approach allowed me to keep a clear record of all changes in case I needed to revert to previous code. In total, I have created nine different branches for this project. 
 
 I also made comments on the Git pull requests and included relevant screenshots of the testing steps from Insomnia. My project has evolved from the initial ER diagram as I identified modifications that would enhance the API's functionality. Using Trello, I implemented checklists to ensure I thoroughly tested all endpoints. Additionally, adding time estimates and labels helped me monitor my progress and ensure that I could complete the project on schedule.
-
 
 Bellow, I have attached some screenshots of my trello board and git commits.
 
@@ -60,8 +60,8 @@ Bellow, I have attached some screenshots of my trello board and git commits.
 [Link to Trello Board](https://trello.com/b/rwRXu3bo)
 
 
-R3 - 
-# Third-party services, packages and dependencies used in this app.
+## R3 
+### Third-party services, packages and dependencies used in this app.
 
 - Virtual environment
 Virtual environment is used to isolate the project to not interfere with other projects.
@@ -70,7 +70,7 @@ This is the first step when we start on the API project. To set up the virtual e
 - Python-dot-env
 This package is used to help setting up the environment variables that are used to keep sensitive data such as username, password secure. In our project, the environment variables holds the information from database URL and JWT secret key. This file is excluded from the git, but in order for our project to work we need a way to tell other developers or testers they have to set up the environment variables on their end. In this project this has been done through the `.env.example` file which it contains the variables examples. Bellow is the example of the .env.example file.
 
-	# Sample of the variables that needs to be defined
+### Sample of the variables that needs to be defined
 	DATABASE_URL = 
 	JWT_SECRET_KEY = 
 
@@ -78,7 +78,7 @@ This package is used to help setting up the environment variables that are used 
 Flask is lightweight yet powerful Python based framework that depends on Werkzeug (WSGI library), Jinja (for rendering the pages on server) and Click (for Flask commands lines and custom commands). All dependencies are installed automatically when you instal Flask.
 
 - PostgreSQL
-It's an open-source relational database management system. It's consist of tables (it stores the data into rows and columns), schemas (it organises and manages DB objects). It's a very versatile system as it can support a wide range of data types and it can integrate with different programming languages.
+It's an open-source relational database management system. It's consist of tables (it stores the data into rows and columns), schemas (it organise and manages DB objects). Additionally, it's a very versatile system that supports a wide range of data types and integrates with different programming languages.
 
 - Psycopg2 
 It works as the driver that connects the API to the DB. It allows your Python applications to connect to and interact with a PostgreSQL database. 
@@ -193,6 +193,7 @@ Overall, SQLAlchemy provides a great framework for building applications that re
 
 - Cascading: SQLAlchemy allows cascading operations. If you delete record in one table, it will automatically deleted from the related table.
 
+- Allows queries using Python syntax.
 
 ### Example of db.relationship, back-populates, and cascading functionalities in User model
 
@@ -215,7 +216,7 @@ Overall, SQLAlchemy provides a great framework for building applications that re
 		group_created = db.relationship("Group", back_populates = "group_admin", cascade="all, delete")
 
 
-#### Query using filter_by and order_by code to query specific user workout logs
+### Query using filter_by and order_by code to query specific user workout logs
 	
 	@workout_bp.route("/")
 	@jwt_required()
@@ -236,13 +237,82 @@ Overall, SQLAlchemy provides a great framework for building applications that re
 
 
 ## R6 - 
-Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
+
+### Explain how the relations between the diagrammed models will aid the database design
+
+Important: As I continued with my project, I realized I needed to add an extra table to my diagram to store entries from users in groups. This new change will allow me to organize user entries in groups more effectively.
+
+I have also added a new foreign key in the groups table for the created_by attribute to indicate which admin created the group, allowing my queries to be executed more effectively. I have made some changes from the previously submitted ER diagram to improve the functionality of my API. I have discussed these changes with Aamod to get approval.
 
 ![ER diagram](./docs/Marathon_API.drawio.png)
 
-R7 - Explain the implemented models and their relationships, including how the relationships aid the database implementation.
+### Models:
 
-This should focus on the database implementation AFTER coding has begun, eg. during the project development phase.
+#### User: 
+- id: PK
+- name: not null
+- email: not null
+- password: not null
+- is_admin: default=False
+
+#### Workout
+- id: PK
+- title: not null
+- date_created: not null
+_ distance_kms: not null
+- calories_burnt
+- user_id (FK referencing user who created workout log)
+
+#### Groups
+id: PK
+name: not null
+date_created: date
+created_by: user_id (FK referencing the admin who created the group)
+
+#### Group_logs
+id: PK
+date_created: date
+user_id: FK (referencing the user who entered the group), not null
+group_id: FK (referencing the group the user entered), not null
+
+#### Marathons
+id: PK
+name: not null
+event_date: not null
+location: not null
+distance_kms: not null
+
+#### Marathons_logs
+id: not null
+date_created: not null
+group_id: FK(referencing the group who entered the marathon event), not null
+marathon_id: FK (referencing the what marathon event the group entered), not null
+
+### Relationships:
+- User can log many workout logs
+- Workout log belongs to one user
+- User can be part of many groups
+- A group can have many users
+- A group can be created by only one user
+- Groups can enter many marathons
+- Marathons can be entered by many groups
+
+
+## R7 -
+### Explain the implemented models and their relationships, including how the relationships aid the database implementation.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # R8 
 
