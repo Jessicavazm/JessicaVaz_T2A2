@@ -16,7 +16,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     
 
-    # Define bidirectional relationships with 'workouts' and 'groups' tables
+    # Define bidirectional relationships with workouts, group_logs and groups tables.
     # Cascade to delete workouts and group if user is deleted
     workouts = db.relationship("Workout", back_populates = "user", cascade="all, delete")
     group_logs = db.relationship("GroupLog", back_populates="user", cascade="all, delete")

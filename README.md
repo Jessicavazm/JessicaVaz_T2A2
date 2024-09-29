@@ -127,14 +127,13 @@ Built-in validators that can be used to enforce data validation. These validatio
 
 Postgresql serves as open-source relational database management system (RDBMS) that enables users to store, manage, and retrieve data efficiently and securely. It's stores data in a practical and easy to manage way. Data is stored in DB using tables where tables are the entities, attributes are the columns and objects are the rows.
 
-It ensure data maintain it's integrity by placing constraints in tables (primary and foreign keys, unique and not null rules). Users are able to perform queries using SQL, PostgreSQL, programming languages.
+It ensures data maintain it's integrity by placing constraints in tables (primary and foreign keys, unique and not null rules). Users are able to perform queries using SQL, PostgreSQL, programming languages.
 
 - By adhering to the ACID principles (Atomicity, Consistency, Isolation, and Durability), the database system ensures that all data is processed and stored in a very reliable way.
 - Postgresql complies with SQL standards which helps when migrating from other SQL databases.
 - Flexibility: PostgreSQL can either be used as relation db system or non relational (NoSQL) for JSON data storage and query.
 - Postgres DB system is compatible with most computer operating systems such as Linux, Windows, MacOS, BSD and Solaris.
 - It's an open source and free of charge application.
-- Supports a great variety of query and procedural languages such as SQL, PL/pgSQL, Python, Perl.
 - Multi-Version concurrency Control allows multiple data to be processed simultaneously without interfering with each other.
 - Accepts Primitives data, Structured data such as Date/time, Arrays, Range, JSON, JSONB, XML, Geometry Data and it also allows you to custom your own data(composite and custom types).
 - PostgreSQL supports many different types of authentication such as GSSAPI, SSPI, LDAP, SCRAM-SHA-256 and Certificate. Pgcrypto extension can also be used in PostgreSQL to perform hashing and encryption to handle sensitive data and ensure data security.
@@ -173,12 +172,71 @@ References: Coder academy workbook assignment T2A1-A - Jessica Vaz
 
 ## R5
 
+### Purpose
+The purpose of SQLAlchemy is to allow interaction with the database using Python objects and classes. Instead of writing SQL queries to create, add, or remove data, SQLAlchemy simplifies these tasks and helps reduce errors. It provides a high-level abstraction that enables developers to define their database schema using Python classes and manage relationships between different data models easily.
+SQLAlchemy also supports queries using filtering, sorting, and joining of data through Python language.
+Overall, SQLAlchemy provides a great framework for building applications that require reliable and efficient data management.
 
 
+### Features
+- SQLalchemy allows integration with different DB systems
+- Easy DB migrations
+- It allows DB queries in Python code
+- Customized how data is handled
+- SQLAlchemy has a large community and many resources available online
+
+### Functionalities  
+
+- Db.relationship: SQLAlchemy allows database relationships to be set in when defining the tables, the relationship demonstrate how all the tables connect between each other. This is very important since in a relational DB, all the data is connected through the tables. 
+
+- Back_populates: establishes a two-way relationship. It allows access to related records from both sides of the relationship.
+
+- Cascading: SQLAlchemy allows cascading operations. If you delete record in one table, it will automatically deleted from the related table.
 
 
+### Example of db.relationship, back-populates, and cascading functionalities in User model
 
-R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
+	class User(db.Model):
+		# Name of the table
+		__tablename__ = "users"
+
+		# Attributes
+		id = db.Column(db.Integer, primary_key=True)
+		name = db.Column(db.String(30), nullable=False)
+		email = db.Column(db.String(50), nullable=False, unique=True)
+		password = db.Column(db.String, nullable=False)
+		is_admin = db.Column(db.Boolean, default=False)
+    
+
+		# Define bidirectional relationships with workouts, group_logs and groups tables.
+		# Cascade to delete workouts and group if user is deleted
+		workouts = db.relationship("Workout", back_populates = "user", cascade="all, delete")
+		group_logs = db.relationship("GroupLog", back_populates="user", cascade="all, delete")
+		group_created = db.relationship("Group", back_populates = "group_admin", cascade="all, delete")
+
+
+#### Query using filter_by and order_by code to query specific user workout logs
+	
+	@workout_bp.route("/")
+	@jwt_required()
+	def get_all_workouts():
+		# Get the current user's identity from the JWT token
+		current_user = get_jwt_identity()
+
+		# Create and execute statement, filter by user's ID, order by desc date
+		stmt = db.select(Workout).filter_by(user_id=current_user).order_by(Workout.date.desc())
+		workouts = list(db.session.scalars(stmt))
+		
+		if workouts:
+			# Serialize data using workouts_schema
+			return workouts_schema.dump(workouts), 200
+		else:
+			# Else return error msg
+			return {"Error": "No workout logs to display for this user."}, 400
+
+
+## R6 - 
+Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
 
 ![ER diagram](./docs/Marathon_API.drawio.png)
 
