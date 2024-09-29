@@ -96,11 +96,8 @@ def delete_log(marathon_id, log_id):
     db.session.delete(log)
     db.session.commit()
 
-    # Fetch marathon info for a more descriptive return message
-    marathon = Marathon.query.get(marathon_id)
-
     # Return acknowledgment message
-    return {"message": f"{group.name} has been successfully removed from {marathon.name} event."}, 200
+    return {"message": "Your group has been successfully removed from this event."}, 200
 
 
 
