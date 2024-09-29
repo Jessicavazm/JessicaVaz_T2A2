@@ -1,12 +1,11 @@
 # Import functools to use wraps method
 import functools
 
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity
 
 from init import db
 from models.user import User
 from models.group import Group
-from models.group_log import GroupLog
 
 
 # Decorator to allow admin to perform specific functions

@@ -1,10 +1,10 @@
 # Marathon running app
 
-# R1 
-# What problem this solves?
+## R1 
+### What problem this solves?
 The Marathon Running API is designed to bring runners together. It has functionality for runners to log their workouts and keep track of workout sessions. In the workout log feature, users are allowed to choose from one of the available run types. Date and distance in kilometers are also required to ensure the log keeps all the crucial information for users to track their best sessions. However, the main functionality of my API is to allow users to be part of running groups. 
 
-Running alone can sometimes feel a bit lonely, but when you run in a group, it encourages you to push yourself a little harder, and then the run becomes more enjoyable. This app strives to motivate it's members through accountability. 
+Running alone can sometimes feel a bit lonely, but when you run in a group, it encourages you to push yourself a little harder, and then the run becomes more enjoyable. This app strives to motivate it's members through accountability to achieve a healthier life style. The goal is to turn exercising into a fun and engaging experience rather than a chore.
 
 Each group will have an admin who will enroll their group in marathons created by different group admins. It’s very practical for users: they can check the available groups and choose which group they want to join, and they can even be part of more than one group. When checking the groups, users will be able to see who the admin of that group is, the group’s members, and what marathons that group is currently enrolled in.
 
@@ -13,8 +13,8 @@ Admins are responsible for creating marathon events and managing any changes, su
 I believe this app combines two important things: staying healthy and making friends. It also very flexible, allowing the members to choose what group resinates more with them and having the choice to leave the group at any time. 
 
 
-# R2 
-## How are the tasks are tracked?
+## R2 
+### How are the tasks tracked?
 
 I have tracked tasks and changes using GitHub and Trello. To manage the development of different features—especially since this was my first time creating an API. I created a new branch for each feature. This approach allowed me to keep a clear record of all changes in case I needed to revert to previous code. In total, I have created nine different branches for this project. 
 
@@ -60,7 +60,64 @@ Bellow, I have attached some screenshots of my trello board and git commits.
 [Link to Trello Board](https://trello.com/b/rwRXu3bo)
 
 
-R3 - List and explain the third-party services, packages and dependencies used in this app.
+R3 - 
+# Third-party services, packages and dependencies used in this app.
+
+- Virtual environment
+Virtual environment is used to isolate the project to not interfere with other projects.
+This is the first step when we start on the API project. To set up the virtual environment we navigate to our source folder and type: *python3 -m venv venv*. The name `venv` is a convention name used for virtual environments. To activate the virtual environment we navigate to our source folder and type *source venv/bin/activate*. Now we can start getting all the necessary dependencies to build the API project.
+
+- Python-dot-env
+This package is used to help setting up the environment variables that are used to keep sensitive data such as username, password secure. In our project, the environment variables holds the information from database URL and JWT secret key. This file is excluded from the git, but in order for our project to work we need a way to tell other developers or testers they have to set up the environment variables on their end. In this project this has been done through the `.env.example` file which it contains the variables examples. Bellow is the example of the .env.example file.
+
+	# Sample of the variables that needs to be defined
+	DATABASE_URL = 
+	JWT_SECRET_KEY = 
+
+- Flask
+Flask is lightweight yet powerful Python based framework that depends on Werkzeug (WSGI library), Jinja (for rendering the pages on server) and Click (for Flask commands lines and custom commands). All dependencies are installed automatically when you instal Flask.
+
+- Psycopg2 
+It works as the driver that connects the API to the DB. It allows your Python applications to connect to and interact with a PostgreSQL database. 
+
+- SQLalchemy 
+It's an Object-Relational Mapping (ORM), that converts Python objects(classes) into database tables. It also allows SQL queries using Python language.
+
+- Marshmallow 
+It helps flask to read data from/ to the database. It's a Python library used for serialisation and deserialisation of data. 
+ - Serialise (convert Python objects into JSON).
+ - Deserialise (convert input data into Python objects).
+
+- Marshmallow_sqlalchemy 
+Extension that facilitates integration between marshmallow and sqlalchemy, it generates schemas based on sqlalchemy models that is used for data serialization/deserialization.
+
+- Sqlalchemy.exc
+It handles exception errors that might arise when dealing with database operations. It includes: data integrity errors, data errors.
+
+- Marshmallow.exceptions
+Used to handle validations errors when serializing and deserializing data.
+ 
+- Flask_bcrypt  
+Used for handling sensitive data and password encryption.
+
+- Flask_jwt_extended 
+Used for authentication methods, token creation.
+
+- JWTManager
+It helps in the process of token decoding and verification.
+
+- Functools
+It's used when creating decorators, it allows a function to take another function as a parameter by using the wraps method.
+
+- OS
+Python standard library, it's used to fetch environment variables from .env file and import into main.py file.
+
+- Datetime
+To display time in attributes that requires time information.
+
+- Marshmallow.validate
+Built-in validators that can be used to enforce data validation. These validations are placed in the schemas. It can be used on name, email, password, one of (it's used to ensure that a field's value is one of a specified set of acceptable choices).
+
 
 R4 - Explain the benefits and drawbacks of this app’s underlying database system.
 
