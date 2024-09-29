@@ -77,6 +77,9 @@ This package is used to help setting up the environment variables that are used 
 - Flask
 Flask is lightweight yet powerful Python based framework that depends on Werkzeug (WSGI library), Jinja (for rendering the pages on server) and Click (for Flask commands lines and custom commands). All dependencies are installed automatically when you instal Flask.
 
+- PostgreSQL
+It's an open-source relational database management system. It's consist of tables (it stores the data into rows and columns), schemas (it organises and manages DB objects). It's a very versatile system as it can support a wide range of data types and it can integrate with different programming languages.
+
 - Psycopg2 
 It works as the driver that connects the API to the DB. It allows your Python applications to connect to and interact with a PostgreSQL database. 
 
@@ -101,7 +104,7 @@ Used to handle validations errors when serializing and deserializing data.
 Used for handling sensitive data and password encryption.
 
 - Flask_jwt_extended 
-Used for authentication methods, token creation.
+Flask extension used for authentication methods by creating tokens.
 
 - JWTManager
 It helps in the process of token decoding and verification.
@@ -110,7 +113,7 @@ It helps in the process of token decoding and verification.
 It's used when creating decorators, it allows a function to take another function as a parameter by using the wraps method.
 
 - OS
-Python standard library, it's used to fetch environment variables from .env file and import into main.py file.
+It's part of Python standard library, it's used to fetch environment variables from .env file and import into main.py file. It connects with the operating system.
 
 - Datetime
 To display time in attributes that requires time information.
@@ -119,9 +122,61 @@ To display time in attributes that requires time information.
 Built-in validators that can be used to enforce data validation. These validations are placed in the schemas. It can be used on name, email, password, one of (it's used to ensure that a field's value is one of a specified set of acceptable choices).
 
 
-R4 - Explain the benefits and drawbacks of this app’s underlying database system.
+## R4 
+### Benefits and drawbacks of this app’s underlying database system.
 
-R5 - Explain the features, purpose and functionalities of the object-relational mapping system (ORM) used in this app.
+Postgresql serves as open-source relational database management system (RDBMS) that enables users to store, manage, and retrieve data efficiently and securely. It's stores data in a practical and easy to manage way. Data is stored in DB using tables where tables are the entities, attributes are the columns and objects are the rows.
+
+It ensure data maintain it's integrity by placing constraints in tables (primary and foreign keys, unique and not null rules). Users are able to perform queries using SQL, PostgreSQL, programming languages.
+
+- By adhering to the ACID principles (Atomicity, Consistency, Isolation, and Durability), the database system ensures that all data is processed and stored in a very reliable way.
+- Postgresql complies with SQL standards which helps when migrating from other SQL databases.
+- Flexibility: PostgreSQL can either be used as relation db system or non relational (NoSQL) for JSON data storage and query.
+- Postgres DB system is compatible with most computer operating systems such as Linux, Windows, MacOS, BSD and Solaris.
+- It's an open source and free of charge application.
+- Supports a great variety of query and procedural languages such as SQL, PL/pgSQL, Python, Perl.
+- Multi-Version concurrency Control allows multiple data to be processed simultaneously without interfering with each other.
+- Accepts Primitives data, Structured data such as Date/time, Arrays, Range, JSON, JSONB, XML, Geometry Data and it also allows you to custom your own data(composite and custom types).
+- PostgreSQL supports many different types of authentication such as GSSAPI, SSPI, LDAP, SCRAM-SHA-256 and Certificate. Pgcrypto extension can also be used in PostgreSQL to perform hashing and encryption to handle sensitive data and ensure data security.
+
+## Functionalities 
+- Data Integrity and Constraints
+ - Primary Keys: Unique identifiers in each table
+ - Foreign Keys: Maintain referential integrity between related tables.
+ - Constraints: ensure rules on attributes.
+
+- Table partitioning
+ - Useful when it comes to table management and readability. This function slipt larger table in smaller tables but the table is still managed as one piece.
+
+- Role Management: 
+ - Create and manage user roles and permissions.
+
+- Data Definition Language (DDL)
+ - Create tables: Define new tables with specific columns, data types, and constraints.
+ - Alter Tables: Modify existing tables to add, remove, or change columns and constraints.
+ - Drop Tables: Remove tables and their data from the DB
+
+- Data Manipulation Language (DML)
+ - Insert Data: Add new data using the INSERT statement.
+ - Update Data: Modify existing data using the UPDATE statement.
+ - Deleting Data: Remove data using the DELETE statement.
+ - Selecting Data: Retrieve data from tables using the SELECT statement combined with a condition.
+
+### Drawbacks:
+
+- Database software does not carry liability for damages or offers warranty of any kind.
+- Data migrating/ and software updates can be complex/slow.
+- Performance can be considered slower than SQL Server and MySQL.
+
+References: Coder academy workbook assignment T2A1-A - Jessica Vaz
+
+
+## R5
+
+
+
+
+
 
 R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
 
