@@ -73,9 +73,9 @@ def login_user():
 
 # PUT, PATCH method => /auth/users/<user_id>
 # Route for users to update their info
-@auth_bp.route("/users/", methods = ["PUT", "PATCH"])
+@auth_bp.route("/users/<int:user_id>", methods = ["PUT", "PATCH"])
 @jwt_required()
-def update_user():
+def update_user(user_id):
     try:    
         # Get the fields from body of the request, partial=True to update partial data
         body_data = UserSchema().load(request.get_json(), partial=True)

@@ -18,7 +18,7 @@ class Group(db.Model):
 
     # Define bidirectional relationships with group_admin creator, groups_logs and marathons_logs
     # Cascade to delete logs if group is deleted
-    group_admin = db.relationship("User", back_populates= "group_created", cascade="all, delete")
+    group_admin = db.relationship("User", back_populates= "group_created")
     group_logs = db.relationship("GroupLog", back_populates= "group", cascade="all, delete")
     marathon_logs = db.relationship("MarathonLog", back_populates= "group", cascade="all, delete")
 

@@ -36,6 +36,7 @@ def get_all_marathons():
 # GET method => /marathons/<marathon_id>
 # Route for users and admins to see a specific marathon
 @marathon_bp.route("/<int:marathon_id>")
+@jwt_required()
 def get_a_marathon(marathon_id):
     # filter_by to select a specific workout
     stmt = db.select(Marathon).filter_by(id=marathon_id)
@@ -48,9 +49,9 @@ def get_a_marathon(marathon_id):
         return {"error": f"Marathon with {marathon_id} not found."}, 404
 
 
-# POST method => /marathons
+# POST method => /marathons/register
 # Route for admins to create marathons, more than one allowed per admin.
-@marathon_bp.route("/", methods=["POST"])
+@marathon_bp.route("/register", methods=["POST"])
 @jwt_required()
 @auth_as_admin_decorator
 def register_marathon():
@@ -90,12 +91,12 @@ def register_marathon():
 
 
 # PUT/PATCH methods => /marathons/<marathon_id>
-# Route for admins to update marathons events
+# Route for admins to update marathons events, 
+# All admins are allowed to update info on marathon events.
 @marathon_bp.route("/<int:marathon_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 @auth_as_admin_decorator
 def update_marathon(marathon_id):
-    
     # Fetch fields from body of request
     body_data = marathon_schema.load(request.get_json(), partial=True)
     stmt = db.select(Marathon).filter_by(id=marathon_id)
@@ -131,11 +132,11 @@ def update_marathon(marathon_id):
 
 
 # Route for admin to delete marathon event
+# All admins are allowed to delete the marathons events
 @marathon_bp.route("/<int:marathon_id>", methods=["DELETE"])
 @jwt_required()
 @auth_as_admin_decorator
 def delete_marathon(marathon_id):
-    
     # Fetch the marathon from DB with stmt
     stmt = db.select(Marathon).filter_by(id=marathon_id)
     marathon = db.session.scalar(stmt)

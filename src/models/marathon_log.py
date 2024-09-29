@@ -26,7 +26,7 @@ class MarathonLog(db.Model):
 # Only include attribute 'name' from 'groups' table
 # Exclude logs from marathon schema to avoid redundant data info
 class MarathonLogSchema(ma.Schema):
-    group = fields.Nested("GroupSchema", only =["marathon_logs"])
+    group = fields.Nested("GroupSchema", exclude=["marathon_logs"])
     marathon = fields.Nested("MarathonSchema", exclude=["marathon_logs"])
     class Meta:
         fields = ["id", "entry_created", "group", "marathon"]

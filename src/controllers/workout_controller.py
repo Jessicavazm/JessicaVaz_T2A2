@@ -7,7 +7,6 @@ from psycopg2 import errorcodes
 
 from init import db
 from models.workout import Workout, workout_schema, workouts_schema
-from models.user import User
 
 
 # Create workout blueprint
@@ -100,7 +99,7 @@ def update_workout(workout_id):
         # If workout exists, check ownership and edit required fields
         if workout:
             # Check if the current user is the owner of the workout
-            # Convert values to int to ensure compatibility
+            # Convert values to int to ensure compatibility check
             if int(workout.user_id) != int(current_user_id):
                 return {"error": "You do not have permission to update this workout."}, 403
             

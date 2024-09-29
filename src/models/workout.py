@@ -7,7 +7,7 @@ from init import db, ma
 
 
 # Specific entries allowed for workout title attribute
-VALID_STATUSES = ("Treadmill", "Outside run", "Outside Walk", "Marathon run")
+VALID_STATUSES = ("Treadmill", "Outside run", "Outside walk", "Marathon run")
 
 class Workout(db.Model):
     # Name of the table

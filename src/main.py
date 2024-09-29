@@ -3,13 +3,11 @@ import os
 
 # To create the API
 from flask import Flask
-
 # To handle Validation errors
 from marshmallow.exceptions import ValidationError
 
 # Import objects from init.py
 from init import db, ma, bcrypt, jwt
-
 # Import blueprints to register them in the app
 from controllers.cli_controllers import db_commands
 from controllers.auth_controller import auth_bp
