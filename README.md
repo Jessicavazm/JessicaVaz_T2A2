@@ -1,6 +1,6 @@
 # Marathon running app
 
-R1 - 
+# R1 
 # What problem this solves?
 The Marathon Running API is designed to bring runners together. It has functionality for runners to log their workouts and keep track of workout sessions. In the workout log feature, users are allowed to choose from one of the available run types. Date and distance in kilometers are also required to ensure the log keeps all the crucial information for users to track their best sessions. However, the main functionality of my API is to allow users to be part of running groups. 
 
@@ -13,7 +13,52 @@ Admins are responsible for creating marathon events and managing any changes, su
 I believe this app combines two important things: staying healthy and making friends. It also very flexible, allowing the members to choose what group resinates more with them and having the choice to leave the group at any time. 
 
 
-R2 - Describe the way tasks are allocated and tracked in your project.
+# R2 
+## How are the tasks are tracked?
+
+I have tracked tasks and changes using GitHub and Trello. To manage the development of different features—especially since this was my first time creating an API. I created a new branch for each feature. This approach allowed me to keep a clear record of all changes in case I needed to revert to previous code. In total, I have created nine different branches for this project. 
+
+I also made comments on the Git pull requests and included relevant screenshots of the testing steps from Insomnia. My project has evolved from the initial ER diagram as I identified modifications that would enhance the API's functionality. Using Trello, I implemented checklists to ensure I thoroughly tested all endpoints. Additionally, adding time estimates and labels helped me monitor my progress and ensure that I could complete the project on schedule.
+
+
+Bellow, I have attached some screenshots of my trello board and git commits.
+
+## Git Pull requests
+
+![First pull request](./docs/git/models_schemas_pullrequest.png)
+
+![Auth pull request](./docs/git/auth_pullrequest.png)
+
+![Group pull request](./docs/git/group_controller_pullrequest.png)
+
+![Group_logs pull request](./docs/git/group_logs_pullrequest.png)
+
+![Log_controller pull request](./docs/git/log_controller_pullrequest.png)
+
+![Marathon pull request](./docs/git/marathon_controller_pullrequest.png)
+
+![Workout pull request](./docs/git/workout_pullrequest.png)
+
+## Trello
+
+![Trello progress 1](./docs/trello/trello1.png)
+
+![Trello progress 2](./docs/trello/trello2.png)
+
+![Trello progress 3](./docs/trello/trello3.png)
+
+![Trello progress 4](./docs/trello/trello4.png)
+
+![Trello progress 5](./docs/trello/trello5.png)
+
+![Trello progress 6](./docs/trello/trello6.png)
+
+![Trello progress 7](./docs/trello/trello7.png)
+
+[Link to Git hub T2A2 repo](https://github.com/Jessicavazm/JessicaVaz_T2A2.git)
+
+[Link to Trello Board](https://trello.com/b/rwRXu3bo)
+
 
 R3 - List and explain the third-party services, packages and dependencies used in this app.
 
@@ -32,7 +77,6 @@ This should focus on the database implementation AFTER coding has begun, eg. dur
 # R8 
 
 ## Users endpoints
-
 
 ### Route for users to register:
 	- Route: localhost:8080/auth/register
