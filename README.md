@@ -298,20 +298,145 @@ marathon_id: FK (referencing the what marathon event the group entered), not nul
 - Marathons can be entered by many groups
 
 
-## R7 -
+## R7 
 ### Explain the implemented models and their relationships, including how the relationships aid the database implementation.
 
+## User
+
+### Attributes
+Nullable constraint to ensure data input and unique=True to ensure email is unique
+
+- id = db.Column(db.Integer, primary_key=True)
+- name = db.Column(db.String(30), nullable=False)
+- email = db.Column(db.String(50), nullable=False, unique=True)
+- password = db.Column(db.String, nullable=False)
+- is_admin = db.Column(db.Boolean, default=False)
+    
+### Relationship
+Bi-directional relationship with workouts, group_logs and group_created to ensure data is shared across 
+requested tables.
+
+### User schema
+Validation on user's name, email, password.
+- name: Name must be between 2 and 30 characters in length. Name must start with an uppercase letter and contain only letters.
+
+- email: Email must be between 5 and 50 characters in length. The email cannot have consecutive dots, must have a local part, a non-empty domain name, and a top-level domain containing at least two letters. Valid characters include letters, numbers, underscore, period, percent sign, plus sign, and hyphen.
+
+- password: Password must be a minimum of 6 characters and maximum of 20 characters. Password must contain one upper case letter, one digit and one special character.
+
+### Class meta
+    class Meta:
+        fields = ["id", "name", "email", "password", "is_admin", "workouts", "group_logs", "group_created"]
+        ordered = True 
 
 
+## Workout
+
+### Attributes
+
+- id = db.Column(db.Integer, primary_key=True)
+- title = db.Column(db.String, nullable=False) 
+- date =db.Column(db.Date, default=date.today)
+- distance_kms = db.Column(db.Integer, nullable=False)
+- calories_burnt = db.Column(db.Integer)
+
+# FK to reference 'users' table
+-user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+- Bidirectional relationships with 'users' table
+	user = db.relationship("User", back_populates = "workouts")
+
+### Workout Schema
+
+- Title validation using a constant
+	title = fields.String(required=True, validate=OneOf(VALID_STATUSES))
+    
+- Class Meta:
+    fields = ["id", "title", "date", "distance_kms", "calories_burnt", "user"]
+
+### Group
+
+# Attributes
+- id = db.Column(db.Integer, primary_key=True)
+- name = db.Column(db.String(30), nullable=False)
+- date_created = db.Column(db.Date, default=date.today)
+- created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True)
+
+### Bidirectional relationships with group_admin creator, groups_logs and marathons_logs
+    group_admin = db.relationship("User", back_populates= "group_created")
+    group_logs = db.relationship("GroupLog", back_populates= "group", cascade="all, delete")
+    marathon_logs = db.relationship("MarathonLog", back_populates= "group", cascade="all, delete")
+
+### Group schema
+
+- Validation for attribute 'name':
+    name = fields.String(required=True, validate=And(Length(min=4, max=30, error="Name must be between 4 and 30 characters in length."), Regexp("^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$", error="Name must start with an uppercase letter and contain only letters.")))
+
+- class Meta:
+	fields = ["id", "name", "date_created", "created_by", "group_admin", "group_logs", "marathon_logs"]
+      
+## Group_logs
+
+### Attributes
+
+- id = db.Column(db.Integer, primary_key=True)
+- entry_created = db.Column(db.Date, default=date.today) 
+
+### Foreign keys to reference both 'users' and 'groups' tables
+- user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+- group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
+
+### Bi directional relationships with 'users' and 'groups' tables
+user = db.relationship("User", back_populates="group_logs")
+group = db.relationship("Group", back_populates="group_logs")
+
+### Group_log schema
+class Meta:
+    fields = ["id", "entry_created", "user", "group"]
 
 
+## Marathon table
+
+### Attributes
+
+- id = db.Column(db.Integer, primary_key=True)
+- name = db.Column(db.String(30), nullable=False)
+- event_date = db.Column(db.Date, nullable=False)
+- location = db.Column(db.String(50), nullable=False)
+- distance_kms = db.Column(db.Integer, nullable=False)
+    
+### Bidirectional relationships with 'marathon_logs' table
+- Cascade to delete marathon_logs and group if marathon is deleted
+    marathon_logs = db.relationship("MarathonLog", back_populates="marathon", cascade="all, delete")
+
+### Schemas
+- Validation for 'name' and 'location'
+    name = Name must be between 4 and 30 characters in length. Name must start with an uppercase letter and contain only letters."
+    
+- Validation for attribute 'location'
+    Allows letter, numbers, spaces, apostrophes and commas. Location must be between 10 and 50 characters in length.
+
+- Class Meta:
+    fields = ["id", "name", "event_date", "location", "distance_kms", "marathon_logs"]
 
 
+## Marathon_logs table
 
+### Attributes
+- id = db.Column(db.Integer, primary_key=True)
+- entry_created = db.Column(db.Date, default=date.today) 
 
+# Foreign keys to reference both 'groups' and 'marathons' tables
+- group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
+- marathon_id = db.Column(db.Integer, db.ForeignKey("marathons.id"), nullable=False)
 
+# Bidirectional relationships with 'groups' and 'marathons' tables
+group = db.relationship("Group", back_populates="marathon_logs")
+marathon = db.relationship("Marathon", back_populates="marathon_logs")
 
-
+### Marathon_logs Schema
+- class Meta:
+    fields = ["id", "entry_created", "group", "marathon"]
 
 
 # R8 

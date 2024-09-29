@@ -15,8 +15,8 @@ class Marathon(db.Model):
     location = db.Column(db.String(50), nullable=False)
     distance_kms = db.Column(db.Integer, nullable=False)
     
-    # Define bidirectional relationships with 'logs' table
-    # Cascade to delete logs and group if marathon is deleted
+    # Define bidirectional relationships with 'marathon_logs' table
+    # Cascade to delete marathon logs and group if marathon is deleted
     marathon_logs = db.relationship("MarathonLog", back_populates="marathon", cascade="all, delete")
 
 # Define 'marathon' schema and class 'Meta' fields to serialize/ deserialize data
